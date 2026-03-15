@@ -1,0 +1,19 @@
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+.env
+*.db
+
+# local runtime artifacts
+.DS_Store
+.pytest_cache/
+.ruleshield-proxy.log
+test-runs/
+
+# dashboard local deps/build
+dashboard/node_modules/
+dashboard/.svelte-kit/
+dashboard/build/

@@ -1,0 +1,298 @@
+[
+  {
+    "id": "file_listing_request",
+    "name": "File Listing Request",
+    "description": "Intercepts requests to list files or directory contents. Lower priority since the agent should proceed to use its file listing tool.",
+    "patterns": [
+      {"type": "contains", "value": "list files", "field": "last_user_message"},
+      {"type": "contains", "value": "show files", "field": "last_user_message"},
+      {"type": "contains", "value": "what files", "field": "last_user_message"},
+      {"type": "exact", "value": "ls", "field": "last_user_message"},
+      {"type": "contains", "value": "directory listing", "field": "last_user_message"},
+      {"type": "regex", "value": "^ls\\s", "field": "last_user_message"},
+      {"type": "contains", "value": "list the files", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 40, "field": "last_user_message"},
+      {"type": "max_messages", "value": 2}
+    ],
+    "response": {
+      "content": "I'll check the directory for you.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.90,
+    "priority": 2,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "read_file_request",
+    "name": "Read File Request",
+    "description": "Catches requests to read or view a file, allowing the agent to proceed with its file reading tool.",
+    "patterns": [
+      {"type": "contains", "value": "read file", "field": "last_user_message"},
+      {"type": "contains", "value": "show me the file", "field": "last_user_message"},
+      {"type": "contains", "value": "cat ", "field": "last_user_message"},
+      {"type": "contains", "value": "open file", "field": "last_user_message"},
+      {"type": "contains", "value": "view file", "field": "last_user_message"},
+      {"type": "regex", "value": "^cat\\s", "field": "last_user_message"},
+      {"type": "contains", "value": "read the file", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 60, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I'll read that file for you.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.88,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "run_command_confirmation",
+    "name": "Run Command Confirmation",
+    "description": "Handles short confirmations to run or execute a previously discussed command.",
+    "patterns": [
+      {"type": "exact", "value": "run it", "field": "last_user_message"},
+      {"type": "exact", "value": "execute it", "field": "last_user_message"},
+      {"type": "contains", "value": "go ahead and run", "field": "last_user_message"},
+      {"type": "exact", "value": "yes run it", "field": "last_user_message"},
+      {"type": "exact", "value": "do it", "field": "last_user_message"},
+      {"type": "exact", "value": "execute", "field": "last_user_message"},
+      {"type": "exact", "value": "run", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 20, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Executing now.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.92,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "task_completion_ack",
+    "name": "Task Completion Acknowledgment",
+    "description": "Catches messages indicating the user is done and needs nothing else.",
+    "patterns": [
+      {"type": "exact", "value": "done", "field": "last_user_message"},
+      {"type": "exact", "value": "finished", "field": "last_user_message"},
+      {"type": "exact", "value": "complete", "field": "last_user_message"},
+      {"type": "contains", "value": "that's all", "field": "last_user_message"},
+      {"type": "contains", "value": "nothing else", "field": "last_user_message"},
+      {"type": "exact", "value": "all done", "field": "last_user_message"},
+      {"type": "exact", "value": "that's it", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 25, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Got it! Let me know if you need anything else.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.91,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "error_retry_request",
+    "name": "Error Retry Request",
+    "description": "Handles short requests to retry a failed operation.",
+    "patterns": [
+      {"type": "exact", "value": "try again", "field": "last_user_message"},
+      {"type": "exact", "value": "retry", "field": "last_user_message"},
+      {"type": "exact", "value": "run again", "field": "last_user_message"},
+      {"type": "exact", "value": "do it again", "field": "last_user_message"},
+      {"type": "exact", "value": "redo", "field": "last_user_message"},
+      {"type": "contains", "value": "try it again", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 20, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Retrying now.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.85,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "show_explain_error",
+    "name": "Show / Explain What Happened",
+    "description": "Catches requests to explain errors or show what went wrong.",
+    "patterns": [
+      {"type": "contains", "value": "what happened", "field": "last_user_message"},
+      {"type": "contains", "value": "what went wrong", "field": "last_user_message"},
+      {"type": "contains", "value": "show error", "field": "last_user_message"},
+      {"type": "contains", "value": "what's the error", "field": "last_user_message"},
+      {"type": "contains", "value": "what is the error", "field": "last_user_message"},
+      {"type": "contains", "value": "show the error", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 35, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Let me check the output for you.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.82,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "undo_revert_request",
+    "name": "Undo / Revert Request",
+    "description": "Handles requests to undo or revert the last change.",
+    "patterns": [
+      {"type": "exact", "value": "undo", "field": "last_user_message"},
+      {"type": "exact", "value": "revert", "field": "last_user_message"},
+      {"type": "exact", "value": "go back", "field": "last_user_message"},
+      {"type": "exact", "value": "undo that", "field": "last_user_message"},
+      {"type": "exact", "value": "cancel that", "field": "last_user_message"},
+      {"type": "contains", "value": "revert that", "field": "last_user_message"},
+      {"type": "contains", "value": "undo the last", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 20, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I'll revert the last change.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.80,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "save_commit_request",
+    "name": "Save / Commit Request",
+    "description": "Catches short requests to save or commit changes.",
+    "patterns": [
+      {"type": "exact", "value": "save it", "field": "last_user_message"},
+      {"type": "exact", "value": "commit", "field": "last_user_message"},
+      {"type": "contains", "value": "save changes", "field": "last_user_message"},
+      {"type": "exact", "value": "git commit", "field": "last_user_message"},
+      {"type": "exact", "value": "save", "field": "last_user_message"},
+      {"type": "contains", "value": "commit it", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 25, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Saving your changes.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.87,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "show_diff_changes",
+    "name": "Show Diff / Changes",
+    "description": "Handles requests to see a diff or review changes made.",
+    "patterns": [
+      {"type": "exact", "value": "show diff", "field": "last_user_message"},
+      {"type": "contains", "value": "what changed", "field": "last_user_message"},
+      {"type": "contains", "value": "show changes", "field": "last_user_message"},
+      {"type": "exact", "value": "git diff", "field": "last_user_message"},
+      {"type": "exact", "value": "diff", "field": "last_user_message"},
+      {"type": "contains", "value": "show the diff", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 30, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Here are the changes I made.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.85,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "skip_next_request",
+    "name": "Skip / Next Request",
+    "description": "Catches requests to skip the current item or move to the next task.",
+    "patterns": [
+      {"type": "exact", "value": "skip", "field": "last_user_message"},
+      {"type": "exact", "value": "next", "field": "last_user_message"},
+      {"type": "exact", "value": "move on", "field": "last_user_message"},
+      {"type": "exact", "value": "skip that", "field": "last_user_message"},
+      {"type": "exact", "value": "ignore that", "field": "last_user_message"},
+      {"type": "contains", "value": "skip it", "field": "last_user_message"},
+      {"type": "contains", "value": "move along", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 20, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Skipping. What would you like to do next?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.88,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "wait_pause_request",
+    "name": "Wait / Pause Request",
+    "description": "Handles requests to pause or wait before continuing.",
+    "patterns": [
+      {"type": "exact", "value": "wait", "field": "last_user_message"},
+      {"type": "exact", "value": "hold on", "field": "last_user_message"},
+      {"type": "exact", "value": "pause", "field": "last_user_message"},
+      {"type": "exact", "value": "stop", "field": "last_user_message"},
+      {"type": "exact", "value": "one moment", "field": "last_user_message"},
+      {"type": "contains", "value": "hold on a", "field": "last_user_message"},
+      {"type": "exact", "value": "one sec", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 20, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I'll wait. Let me know when you're ready to continue.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.86,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "clarification_request",
+    "name": "Clarification Request",
+    "description": "Catches requests for clarification or explanation of the agent's previous response.",
+    "patterns": [
+      {"type": "contains", "value": "what do you mean", "field": "last_user_message"},
+      {"type": "contains", "value": "can you explain", "field": "last_user_message"},
+      {"type": "contains", "value": "I don't understand", "field": "last_user_message"},
+      {"type": "exact", "value": "clarify", "field": "last_user_message"},
+      {"type": "contains", "value": "i don't understand", "field": "last_user_message"},
+      {"type": "contains", "value": "what does that mean", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 40, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Could you provide more details about what you'd like me to do?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.78,
+    "priority": 2,
+    "enabled": true,
+    "hit_count": 0
+  }
+]

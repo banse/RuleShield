@@ -1,0 +1,26 @@
+id: hermes_user_arcee_complex
+name: Hermes User Arcee Complex (Controlled Growth)
+description: >
+  Arcee-specific complex scenario with controlled growth.
+  Adds a few workflow intents beyond the core seed, but avoids broad
+  expectation spread to keep shadow feedback high quality.
+max_prompts: 9
+steps:
+  - id: greeting
+    prompt: "hi"
+  - id: status_ping
+    prompt: "status"
+  - id: capabilities
+    prompt: "what can you do here?"
+  - id: list_files
+    prompt: "list files in this project"
+  - id: readme_brief
+    prompt: "read README.md and summarize briefly"
+  - id: run_confirm
+    prompt: "run ls in this project and confirm when done"
+  - id: show_changes
+    prompt: "show me what changed"
+  - id: explain_output
+    prompt: "explain what happened"
+  - id: goodbye
+    prompt: "bye"

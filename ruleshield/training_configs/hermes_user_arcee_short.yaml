@@ -1,0 +1,15 @@
+id: hermes_user_arcee_short
+name: Hermes User Arcee Short (Core Seed)
+description: >
+  Arcee-specific seed scenario with a minimal core rule set.
+  Keeps expectations narrow to let RuleShield grow naturally from stable matches.
+max_prompts: 4
+steps:
+  - id: greeting
+    prompt: "hi"
+  - id: status_ping
+    prompt: "status"
+  - id: list_files
+    prompt: "list files in this project"
+  - id: run_confirm
+    prompt: "run ls in this project and confirm when done"

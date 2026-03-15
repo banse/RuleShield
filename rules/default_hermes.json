@@ -1,0 +1,200 @@
+[
+  {
+    "id": "greeting_simple",
+    "name": "Simple Greeting",
+    "description": "Intercepts basic greetings like hello, hi, hey.",
+    "patterns": [
+      {"type": "exact", "value": "hello", "field": "last_user_message"},
+      {"type": "exact", "value": "hi", "field": "last_user_message"},
+      {"type": "exact", "value": "hey", "field": "last_user_message"},
+      {"type": "contains", "value": "hello", "field": "last_user_message"},
+      {"type": "contains", "value": "hi there", "field": "last_user_message"},
+      {"type": "contains", "value": "hey there", "field": "last_user_message"},
+      {"type": "exact", "value": "hallo", "field": "last_user_message"},
+      {"type": "exact", "value": "hallo?", "field": "last_user_message"},
+      {"type": "contains", "value": "hallo", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 20, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Hello! I'm here and ready to help. What can I do for you today?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.95,
+    "priority": 10,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "status_check",
+    "name": "Status Check",
+    "description": "Handles 'are you there' and status inquiry messages.",
+    "patterns": [
+      {"type": "contains", "value": "are you there", "field": "last_user_message"},
+      {"type": "contains", "value": "you there", "field": "last_user_message"},
+      {"type": "contains", "value": "what's the status", "field": "last_user_message"},
+      {"type": "contains", "value": "what is the status", "field": "last_user_message"},
+      {"type": "contains", "value": "still there", "field": "last_user_message"},
+      {"type": "exact", "value": "status", "field": "last_user_message"},
+      {"type": "exact", "value": "ping", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 40, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Yes, I'm here and active! How can I assist you?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.92,
+    "priority": 9,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "acknowledgment",
+    "name": "Acknowledgment",
+    "description": "Catches short acknowledgment messages like ok, thanks, got it.",
+    "patterns": [
+      {"type": "exact", "value": "ok", "field": "last_user_message"},
+      {"type": "exact", "value": "okay", "field": "last_user_message"},
+      {"type": "exact", "value": "thanks", "field": "last_user_message"},
+      {"type": "exact", "value": "thank you", "field": "last_user_message"},
+      {"type": "exact", "value": "got it", "field": "last_user_message"},
+      {"type": "exact", "value": "understood", "field": "last_user_message"},
+      {"type": "exact", "value": "cool", "field": "last_user_message"},
+      {"type": "exact", "value": "great", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 15, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "You're welcome! Let me know if you need anything else.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.90,
+    "priority": 8,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "simple_confirmation",
+    "name": "Simple Confirmation",
+    "description": "Handles yes/no/proceed/continue single-word confirmations.",
+    "patterns": [
+      {"type": "exact", "value": "yes", "field": "last_user_message"},
+      {"type": "exact", "value": "no", "field": "last_user_message"},
+      {"type": "exact", "value": "proceed", "field": "last_user_message"},
+      {"type": "exact", "value": "continue", "field": "last_user_message"},
+      {"type": "exact", "value": "y", "field": "last_user_message"},
+      {"type": "exact", "value": "n", "field": "last_user_message"},
+      {"type": "exact", "value": "sure", "field": "last_user_message"},
+      {"type": "exact", "value": "go ahead", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 10, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Understood, proceeding. Let me know if you'd like to change course.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.88,
+    "priority": 7,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "capabilities_question",
+    "name": "Capabilities Question",
+    "description": "Responds to 'what can you do' and help requests.",
+    "patterns": [
+      {"type": "contains", "value": "what can you do", "field": "last_user_message"},
+      {"type": "exact", "value": "help", "field": "last_user_message"},
+      {"type": "contains", "value": "what do you do", "field": "last_user_message"},
+      {"type": "contains", "value": "how can you help", "field": "last_user_message"},
+      {"type": "contains", "value": "your capabilities", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 30, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I can help with a wide range of tasks including answering questions, writing, analysis, coding, brainstorming, and more. Just describe what you need and I'll do my best to assist!",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.85,
+    "priority": 6,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "goodbye",
+    "name": "Goodbye",
+    "description": "Handles farewell messages like bye, goodbye, exit, quit.",
+    "patterns": [
+      {"type": "exact", "value": "bye", "field": "last_user_message"},
+      {"type": "exact", "value": "goodbye", "field": "last_user_message"},
+      {"type": "exact", "value": "exit", "field": "last_user_message"},
+      {"type": "exact", "value": "quit", "field": "last_user_message"},
+      {"type": "exact", "value": "see ya", "field": "last_user_message"},
+      {"type": "contains", "value": "good bye", "field": "last_user_message"},
+      {"type": "contains", "value": "bye bye", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 15, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Goodbye! Feel free to come back anytime you need help.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.93,
+    "priority": 9,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "repeat_request",
+    "name": "Repeat / Again Request",
+    "description": "Catches requests to repeat or do something again.",
+    "patterns": [
+      {"type": "contains", "value": "do it again", "field": "last_user_message"},
+      {"type": "contains", "value": "repeat that", "field": "last_user_message"},
+      {"type": "contains", "value": "say that again", "field": "last_user_message"},
+      {"type": "exact", "value": "again", "field": "last_user_message"},
+      {"type": "contains", "value": "one more time", "field": "last_user_message"},
+      {"type": "regex", "value": "^(repeat|redo|again)$", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 25, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I'd be happy to repeat or redo that. Could you clarify what you'd like me to repeat so I get it right?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.80,
+    "priority": 5,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "simple_math_counting",
+    "name": "Simple Math / Counting",
+    "description": "Pattern-based detection of simple counting and math questions.",
+    "patterns": [
+      {"type": "regex", "value": "^how many (letters|words|characters) (in|are in) .{1,30}\\??$", "field": "last_user_message"},
+      {"type": "regex", "value": "^count (the )?(letters|words|characters) in .{1,30}$", "field": "last_user_message"},
+      {"type": "regex", "value": "^what is \\d{1,4} ?[+\\-*/] ?\\d{1,4}\\??$", "field": "last_user_message"},
+      {"type": "regex", "value": "^\\d{1,4} ?[+\\-*/] ?\\d{1,4}$", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 60, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Let me calculate that for you. For precise math and counting, I recommend verifying the result. Could you confirm the specific question?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.70,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  }
+]

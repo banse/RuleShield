@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  ruleshield:
+    build: .
+    ports:
+      - "8337:8337"
+    environment:
+      - RULESHIELD_API_KEY=${LLM_API_KEY:-}
+      - RULESHIELD_PROVIDER_URL=${PROVIDER_URL:-https://api.openai.com}
+      - RULESHIELD_CACHE_ENABLED=true
+      - RULESHIELD_RULES_ENABLED=true
+      - RULESHIELD_ROUTER_ENABLED=true
+      - RULESHIELD_LOG_LEVEL=info
+    volumes:
+      - ruleshield-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8337/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    ports:
+      - "5174:5174"
+    environment:
+      - RULESHIELD_API_URL=http://ruleshield:8337
+    depends_on:
+      ruleshield:
+        condition: service_healthy
+
+volumes:
+  ruleshield-data:

@@ -1,0 +1,19 @@
+id: hermes_user_arcee_medium
+name: Hermes User Arcee Medium (Core + Read)
+description: >
+  Arcee-specific medium scenario. Extends the core seed with lightweight read
+  and acknowledgment intents while keeping response expectations conservative.
+max_prompts: 6
+steps:
+  - id: greeting
+    prompt: "hello"
+  - id: status_ping
+    prompt: "status"
+  - id: list_files
+    prompt: "list files in this project"
+  - id: readme_brief
+    prompt: "read README.md and summarize briefly"
+  - id: run_confirm
+    prompt: "run ls in this project and confirm when done"
+  - id: ack
+    prompt: "thanks"

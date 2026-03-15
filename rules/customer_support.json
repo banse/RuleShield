@@ -1,0 +1,655 @@
+[
+  {
+    "id": "cs_greeting_help",
+    "name": "How Can I Help",
+    "description": "Detects standard support greeting offering help to the customer.",
+    "patterns": [
+      {"type": "contains", "value": "how can i help", "field": "last_user_message"},
+      {"type": "contains", "value": "how may i assist", "field": "last_user_message"},
+      {"type": "contains", "value": "how can i assist", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 40, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Thank you for reaching out! I'm here to help. Please describe your issue or question and I'll do my best to assist you right away.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.90,
+    "priority": 5,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_greeting_welcome",
+    "name": "Welcome to Support",
+    "description": "Catches welcome greetings when a customer enters the support channel.",
+    "patterns": [
+      {"type": "contains", "value": "welcome to support", "field": "last_user_message"},
+      {"type": "contains", "value": "welcome to our support", "field": "last_user_message"},
+      {"type": "startswith", "value": "welcome", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 40, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Welcome! You've reached our support team. We're ready to help you with any questions or issues. What can we do for you today?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.88,
+    "priority": 5,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_greeting_thanks_contact",
+    "name": "Thank You for Contacting",
+    "description": "Responds to the standard thank-you-for-contacting opener.",
+    "patterns": [
+      {"type": "contains", "value": "thank you for contacting", "field": "last_user_message"},
+      {"type": "contains", "value": "thanks for contacting", "field": "last_user_message"},
+      {"type": "contains", "value": "thank you for reaching out", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 50, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "You're welcome! We appreciate you getting in touch. Please let us know how we can help you today.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.89,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_greeting_anything_else",
+    "name": "Anything Else Greeting",
+    "description": "Detects when the agent asks if there is anything else to help with.",
+    "patterns": [
+      {"type": "contains", "value": "is there anything else", "field": "last_user_message"},
+      {"type": "contains", "value": "anything else i can help", "field": "last_user_message"},
+      {"type": "contains", "value": "need anything else", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 50, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "If there's nothing else, I hope I was able to help! Don't hesitate to contact us again if anything comes up. Have a wonderful day!",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.87,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_greeting_great_day",
+    "name": "Have a Great Day",
+    "description": "Catches farewell wishes at the end of a support interaction.",
+    "patterns": [
+      {"type": "contains", "value": "have a great day", "field": "last_user_message"},
+      {"type": "contains", "value": "have a nice day", "field": "last_user_message"},
+      {"type": "contains", "value": "have a good day", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 30, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Thank you! You have a great day too. Remember, we're always here if you need us!",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.91,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_faq_password_reset",
+    "name": "Password Reset FAQ",
+    "description": "Triggers when a customer asks about resetting or recovering their password.",
+    "patterns": [
+      {"type": "contains", "value": "reset password", "field": "last_user_message"},
+      {"type": "contains", "value": "forgot password", "field": "last_user_message"},
+      {"type": "contains", "value": "reset my password", "field": "last_user_message"},
+      {"type": "contains", "value": "forgot my password", "field": "last_user_message"},
+      {"type": "regex", "value": "(can't|cannot) (log ?in|sign ?in)", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 50, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "To reset your password, go to the login page and click 'Forgot Password.' Enter your email address and you'll receive a reset link within a few minutes. Check your spam folder if you don't see it. Need further help?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.92,
+    "priority": 5,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_faq_shipping_status",
+    "name": "Shipping Status FAQ",
+    "description": "Handles inquiries about order shipping status and tracking.",
+    "patterns": [
+      {"type": "contains", "value": "shipping status", "field": "last_user_message"},
+      {"type": "contains", "value": "where is my order", "field": "last_user_message"},
+      {"type": "contains", "value": "track order", "field": "last_user_message"},
+      {"type": "contains", "value": "track my order", "field": "last_user_message"},
+      {"type": "contains", "value": "order status", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 45, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "You can track your order by logging into your account and visiting the 'My Orders' section. You'll find a tracking number and a link to the carrier's tracking page. If you need your tracking number, please share your order ID and I'll look it up for you.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.93,
+    "priority": 5,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_faq_refund",
+    "name": "Refund and Returns FAQ",
+    "description": "Detects questions about refunds, returns, and money-back policies.",
+    "patterns": [
+      {"type": "contains", "value": "refund", "field": "last_user_message"},
+      {"type": "contains", "value": "return policy", "field": "last_user_message"},
+      {"type": "contains", "value": "money back", "field": "last_user_message"},
+      {"type": "contains", "value": "get a refund", "field": "last_user_message"},
+      {"type": "contains", "value": "return my order", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 50, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Our return policy allows returns within 30 days of delivery for a full refund. Items must be in their original condition. To start a return, go to 'My Orders,' select the item, and click 'Request Return.' Refunds are processed within 5-7 business days after we receive the item.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.91,
+    "priority": 5,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_faq_pricing",
+    "name": "Pricing FAQ",
+    "description": "Catches questions about pricing, costs, and subscription plans.",
+    "patterns": [
+      {"type": "contains", "value": "pricing", "field": "last_user_message"},
+      {"type": "contains", "value": "how much", "field": "last_user_message"},
+      {"type": "contains", "value": "plans", "field": "last_user_message"},
+      {"type": "contains", "value": "what does it cost", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 40, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "We offer three plans: Starter at $9/month, Professional at $29/month, and Enterprise with custom pricing. Visit our pricing page at /pricing for a full feature comparison. Would you like details on a specific plan?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.88,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_faq_business_hours",
+    "name": "Business Hours FAQ",
+    "description": "Responds to questions about operating hours and availability.",
+    "patterns": [
+      {"type": "contains", "value": "business hours", "field": "last_user_message"},
+      {"type": "contains", "value": "when are you open", "field": "last_user_message"},
+      {"type": "contains", "value": "hours of operation", "field": "last_user_message"},
+      {"type": "regex", "value": "what (are )?your hours", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 40, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Our support team is available Monday through Friday, 8:00 AM to 8:00 PM EST. Weekend support is available via email with responses within 24 hours. For urgent issues, our chat bot is available 24/7.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.90,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_faq_contact_info",
+    "name": "Contact Information FAQ",
+    "description": "Handles requests for contact details like email or phone.",
+    "patterns": [
+      {"type": "contains", "value": "contact", "field": "last_user_message"},
+      {"type": "contains", "value": "email address", "field": "last_user_message"},
+      {"type": "contains", "value": "phone number", "field": "last_user_message"},
+      {"type": "contains", "value": "how do i reach", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 40, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "You can reach us at support@company.com or call us at 1-800-555-0199. For faster responses, use our live chat during business hours (Mon-Fri, 8 AM-8 PM EST). You can also submit a ticket at /support.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.89,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_faq_cancel_subscription",
+    "name": "Cancel Subscription FAQ",
+    "description": "Detects requests to cancel a subscription or unsubscribe.",
+    "patterns": [
+      {"type": "contains", "value": "cancel subscription", "field": "last_user_message"},
+      {"type": "contains", "value": "cancel my subscription", "field": "last_user_message"},
+      {"type": "contains", "value": "unsubscribe", "field": "last_user_message"},
+      {"type": "contains", "value": "cancel my account", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 45, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I'm sorry to hear you'd like to cancel. You can cancel your subscription from Account Settings > Billing > Cancel Plan. Your access will continue until the end of your current billing period. Before you go, would you like to explore a downgrade or pause option instead?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.92,
+    "priority": 5,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_faq_free_trial",
+    "name": "Free Trial FAQ",
+    "description": "Handles questions about free trials and demos.",
+    "patterns": [
+      {"type": "contains", "value": "free trial", "field": "last_user_message"},
+      {"type": "contains", "value": "try for free", "field": "last_user_message"},
+      {"type": "contains", "value": "demo", "field": "last_user_message"},
+      {"type": "contains", "value": "trial period", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 40, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "We offer a 14-day free trial with full access to all Professional plan features. No credit card required to start. Visit /signup to get started. Would you also like to schedule a guided demo with our team?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.87,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_ack_understand",
+    "name": "Acknowledgment - Understand",
+    "description": "Catches agent acknowledgments indicating understanding.",
+    "patterns": [
+      {"type": "startswith", "value": "i understand", "field": "last_user_message"},
+      {"type": "exact", "value": "understood", "field": "last_user_message"},
+      {"type": "contains", "value": "i see what you mean", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 30, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Thank you for clarifying. I've noted your concern and I'm working on getting this resolved for you. Let me pull up the relevant details now.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.85,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_ack_checking",
+    "name": "Acknowledgment - Checking",
+    "description": "Handles hold/wait messages while checking on something.",
+    "patterns": [
+      {"type": "startswith", "value": "let me check", "field": "last_user_message"},
+      {"type": "contains", "value": "one moment", "field": "last_user_message"},
+      {"type": "contains", "value": "please hold", "field": "last_user_message"},
+      {"type": "contains", "value": "give me a moment", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 35, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Of course, take your time! I'll be right here when you're ready. There's no rush.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.86,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_ack_apology",
+    "name": "Acknowledgment - Apology",
+    "description": "Detects apology messages from the support agent.",
+    "patterns": [
+      {"type": "startswith", "value": "i apologize", "field": "last_user_message"},
+      {"type": "contains", "value": "sorry for the inconvenience", "field": "last_user_message"},
+      {"type": "contains", "value": "we apologize", "field": "last_user_message"},
+      {"type": "contains", "value": "sincerely sorry", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 50, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I appreciate the apology. I understand issues happen. Let's focus on getting this resolved. What are the next steps?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.84,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_ack_patience",
+    "name": "Acknowledgment - Patience",
+    "description": "Catches messages thanking the customer for their patience.",
+    "patterns": [
+      {"type": "contains", "value": "thank you for your patience", "field": "last_user_message"},
+      {"type": "contains", "value": "thanks for your patience", "field": "last_user_message"},
+      {"type": "contains", "value": "appreciate your patience", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 45, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "No problem at all. I want to make sure we get this right for you. Please take whatever time you need.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.85,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_ack_escalate",
+    "name": "Acknowledgment - Escalation",
+    "description": "Detects when an agent indicates they will escalate the issue.",
+    "patterns": [
+      {"type": "contains", "value": "i'll escalate", "field": "last_user_message"},
+      {"type": "contains", "value": "escalate this", "field": "last_user_message"},
+      {"type": "contains", "value": "transfer you to", "field": "last_user_message"},
+      {"type": "contains", "value": "connect you with a specialist", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 55, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Thank you for escalating this. I understand a specialist will be able to help further. Could you let me know the expected response time after escalation?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.83,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_status_ticket_created",
+    "name": "Status - Ticket Created",
+    "description": "Detects notification that a support ticket has been created.",
+    "patterns": [
+      {"type": "contains", "value": "ticket has been created", "field": "last_user_message"},
+      {"type": "contains", "value": "created a ticket", "field": "last_user_message"},
+      {"type": "contains", "value": "your ticket number is", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 55, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Got it, thank you! I've noted the ticket number. How long does it typically take to get an initial response? Should I expect email updates?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.88,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_status_looking_into",
+    "name": "Status - Looking Into It",
+    "description": "Handles messages indicating the team is investigating the issue.",
+    "patterns": [
+      {"type": "contains", "value": "looking into it", "field": "last_user_message"},
+      {"type": "contains", "value": "investigating", "field": "last_user_message"},
+      {"type": "contains", "value": "we're looking into", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 45, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Thank you for the update. I appreciate your team looking into this. Could you give me an estimated timeframe for when I might hear back?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.85,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_status_resolved",
+    "name": "Status - Resolved",
+    "description": "Detects messages indicating the issue has been resolved.",
+    "patterns": [
+      {"type": "contains", "value": "has been resolved", "field": "last_user_message"},
+      {"type": "contains", "value": "issue is resolved", "field": "last_user_message"},
+      {"type": "contains", "value": "this has been fixed", "field": "last_user_message"},
+      {"type": "contains", "value": "problem has been resolved", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 50, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "That's great to hear! Thank you for resolving this. I'll verify on my end and let you know if everything looks good. Appreciate the quick turnaround!",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.90,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_status_update_request",
+    "name": "Status - Update Request",
+    "description": "Catches requests for updates on an existing ticket.",
+    "patterns": [
+      {"type": "contains", "value": "any updates", "field": "last_user_message"},
+      {"type": "contains", "value": "update on my ticket", "field": "last_user_message"},
+      {"type": "contains", "value": "status of my ticket", "field": "last_user_message"},
+      {"type": "contains", "value": "any news on", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 45, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Let me check on the status of your ticket. Could you please provide your ticket number or the email address associated with your account so I can look it up?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.87,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_status_still_working",
+    "name": "Status - Still Working",
+    "description": "Handles messages indicating the team is still working on the issue.",
+    "patterns": [
+      {"type": "contains", "value": "still working on it", "field": "last_user_message"},
+      {"type": "contains", "value": "still being worked on", "field": "last_user_message"},
+      {"type": "contains", "value": "not resolved yet", "field": "last_user_message"},
+      {"type": "contains", "value": "still in progress", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 45, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Thanks for letting me know it's still being addressed. I understand these things take time. I'll check back in 24 hours if I haven't heard an update. Is there anything else I should be aware of in the meantime?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.84,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_confirm_check",
+    "name": "Confirmation - Verify",
+    "description": "Detects confirmation requests asking the customer to verify information.",
+    "patterns": [
+      {"type": "contains", "value": "is that correct", "field": "last_user_message"},
+      {"type": "contains", "value": "can you confirm", "field": "last_user_message"},
+      {"type": "contains", "value": "does that sound right", "field": "last_user_message"},
+      {"type": "contains", "value": "did i get that right", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 50, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Let me review that. Could you please restate the key details so I can confirm everything is accurate before we proceed?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.85,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_confirm_yes",
+    "name": "Confirmation - Affirmative",
+    "description": "Handles affirmative confirmation responses from the customer.",
+    "patterns": [
+      {"type": "contains", "value": "yes that's right", "field": "last_user_message"},
+      {"type": "contains", "value": "that's correct", "field": "last_user_message"},
+      {"type": "exact", "value": "confirmed", "field": "last_user_message"},
+      {"type": "contains", "value": "yes, correct", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 30, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Perfect, thank you for confirming! I'll proceed with the next steps based on the information provided. You should see the changes reflected shortly.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.88,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_confirm_no",
+    "name": "Confirmation - Negative",
+    "description": "Handles negative confirmation responses indicating incorrect information.",
+    "patterns": [
+      {"type": "contains", "value": "no that's wrong", "field": "last_user_message"},
+      {"type": "contains", "value": "that's not right", "field": "last_user_message"},
+      {"type": "contains", "value": "that's incorrect", "field": "last_user_message"},
+      {"type": "contains", "value": "no, that's not correct", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 40, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I apologize for the confusion. Let me correct that. Could you please provide the accurate information so I can update our records and proceed accordingly?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.86,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_confirm_more_info",
+    "name": "Confirmation - Need More Info",
+    "description": "Detects requests for additional information from the customer.",
+    "patterns": [
+      {"type": "contains", "value": "i need more information", "field": "last_user_message"},
+      {"type": "contains", "value": "need more details", "field": "last_user_message"},
+      {"type": "contains", "value": "can you provide more", "field": "last_user_message"},
+      {"type": "contains", "value": "could you elaborate", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 45, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Absolutely! I'd be happy to provide more details. Which specific aspect would you like me to elaborate on? I want to make sure I give you exactly what you need.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.84,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_closing_help_more",
+    "name": "Closing - Anything Else",
+    "description": "Standard closing question asking if the customer needs more help.",
+    "patterns": [
+      {"type": "contains", "value": "anything else i can help with", "field": "last_user_message"},
+      {"type": "contains", "value": "anything else you need", "field": "last_user_message"},
+      {"type": "contains", "value": "is there anything else", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 50, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I think that covers everything for now. Thank you so much for your help today! I'll reach out again if I have any more questions.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.88,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_closing_goodbye",
+    "name": "Closing - Goodbye",
+    "description": "Handles farewell and thanks-for-help messages at the end of support.",
+    "patterns": [
+      {"type": "exact", "value": "goodbye", "field": "last_user_message"},
+      {"type": "contains", "value": "thanks for your help", "field": "last_user_message"},
+      {"type": "contains", "value": "thank you for your help", "field": "last_user_message"},
+      {"type": "contains", "value": "bye, thanks", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 40, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "You're welcome! It was my pleasure helping you today. Don't hesitate to reach out if you need anything in the future. Take care!",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.91,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "cs_closing_survey",
+    "name": "Closing - Satisfaction Survey",
+    "description": "Detects satisfaction survey prompts at the end of a support session.",
+    "patterns": [
+      {"type": "contains", "value": "satisfaction survey", "field": "last_user_message"},
+      {"type": "contains", "value": "rate your experience", "field": "last_user_message"},
+      {"type": "contains", "value": "how was your experience", "field": "last_user_message"},
+      {"type": "regex", "value": "rate (this|your|our) (support|service)", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 55, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I'd be happy to provide feedback! The support I received was helpful and the issue was resolved efficiently. I'll complete the survey. Thanks for the opportunity to share my experience.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.82,
+    "priority": 2,
+    "enabled": true,
+    "hit_count": 0
+  }
+]

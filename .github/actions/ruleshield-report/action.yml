@@ -1,0 +1,279 @@
+name: 'RuleShield Cost Report'
+description: 'Analyze LLM API costs and post a savings report as a PR comment'
+author: 'RuleShield'
+
+branding:
+  icon: 'shield'
+  color: 'blue'
+
+inputs:
+  api_key:
+    description: 'LLM API key (e.g. OpenAI key) passed to the proxy'
+    required: true
+  test_command:
+    description: 'Shell command to run through the RuleShield proxy (e.g. "pytest tests/")'
+    required: false
+    default: ''
+  proxy_port:
+    description: 'Port for the RuleShield proxy'
+    required: false
+    default: '8337'
+  python_version:
+    description: 'Python version to use'
+    required: false
+    default: '3.12'
+  github_token:
+    description: 'GitHub token for posting PR comments (defaults to GITHUB_TOKEN)'
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  savings_pct:
+    description: 'Percentage of LLM costs saved'
+    value: ${{ steps.stats.outputs.savings_pct }}
+  total_requests:
+    description: 'Total LLM requests processed'
+    value: ${{ steps.stats.outputs.total }}
+  cost_without:
+    description: 'Estimated cost without RuleShield'
+    value: ${{ steps.stats.outputs.cost_without }}
+  cost_with:
+    description: 'Actual cost with RuleShield'
+    value: ${{ steps.stats.outputs.cost_with }}
+  saved:
+    description: 'Dollar amount saved'
+    value: ${{ steps.stats.outputs.saved }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python_version }}
+
+    - name: Install RuleShield
+      shell: bash
+      run: pip install ruleshield-hermes
+
+    - name: Initialize RuleShield
+      shell: bash
+      run: ruleshield init
+
+    - name: Start RuleShield Proxy
+      id: proxy
+      shell: bash
+      env:
+        RULESHIELD_API_KEY: ${{ inputs.api_key }}
+        PROXY_PORT: ${{ inputs.proxy_port }}
+      run: |
+        ruleshield start --port "$PROXY_PORT" > /tmp/ruleshield-proxy.log 2>&1 &
+        PROXY_PID=$!
+        echo "proxy_pid=$PROXY_PID" >> "$GITHUB_OUTPUT"
+
+        ATTEMPTS=0
+        MAX_ATTEMPTS=30
+        while [ $ATTEMPTS -lt $MAX_ATTEMPTS ]; do
+          if curl -sf "http://localhost:${PROXY_PORT}/health" > /dev/null 2>&1; then
+            echo "proxy_started=true" >> "$GITHUB_OUTPUT"
+            echo "RuleShield proxy is healthy on port $PROXY_PORT (pid $PROXY_PID)"
+            exit 0
+          fi
+          ATTEMPTS=$((ATTEMPTS + 1))
+          sleep 1
+        done
+
+        echo "proxy_started=false" >> "$GITHUB_OUTPUT"
+        echo "::error::RuleShield proxy failed to start within 30 seconds"
+        cat /tmp/ruleshield-proxy.log 2>/dev/null || true
+        exit 1
+
+    - name: Run tests through proxy
+      if: steps.proxy.outputs.proxy_started == 'true' && inputs.test_command != ''
+      shell: bash
+      env:
+        OPENAI_BASE_URL: http://localhost:${{ inputs.proxy_port }}/v1
+        OPENAI_API_KEY: ${{ inputs.api_key }}
+        ANTHROPIC_BASE_URL: http://localhost:${{ inputs.proxy_port }}/v1
+        ANTHROPIC_API_KEY: ${{ inputs.api_key }}
+      run: |
+        echo "Running: ${{ inputs.test_command }}"
+        ${{ inputs.test_command }}
+
+    - name: Collect RuleShield Stats
+      id: stats
+      if: steps.proxy.outputs.proxy_started == 'true'
+      shell: bash
+      env:
+        PROXY_PORT: ${{ inputs.proxy_port }}
+      run: |
+        STATS=$(curl -sf "http://localhost:${PROXY_PORT}/api/stats" 2>/dev/null || echo '{}')
+
+        python3 - <<'PYEOF'
+        import json, os
+
+        raw = os.environ.get("STATS_JSON", "{}")
+        try:
+            s = json.loads(raw)
+        except json.JSONDecodeError:
+            s = {}
+
+        def g(key, default=0):
+            return s.get(key, default)
+
+        total = int(g("total_requests"))
+        cache = int(g("cache_hits"))
+        rules = int(g("rule_hits"))
+        llm   = int(g("llm_calls"))
+
+        cost_without = float(g("cost_without", g("total_cost", 0)))
+        cost_with    = float(g("cost_with", g("llm_cost", 0)))
+        saved        = float(g("savings_usd", g("saved", cost_without - cost_with)))
+        savings_pct  = float(g("savings_pct", 0))
+
+        if savings_pct == 0 and cost_without > 0:
+            savings_pct = round(saved / cost_without * 100, 1)
+
+        with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+            f.write(f"total={total}\n")
+            f.write(f"cache={cache}\n")
+            f.write(f"rules={rules}\n")
+            f.write(f"llm={llm}\n")
+            f.write(f"cost_without={cost_without:.4f}\n")
+            f.write(f"cost_with={cost_with:.4f}\n")
+            f.write(f"saved={saved:.4f}\n")
+            f.write(f"savings_pct={savings_pct}\n")
+            f.write(f"has_data={'true' if total > 0 else 'false'}\n")
+        PYEOF
+      env:
+        STATS_JSON: ${{ env.STATS || '{}' }}
+
+    - name: Stop RuleShield Proxy
+      if: always() && steps.proxy.outputs.proxy_pid
+      shell: bash
+      run: |
+        kill "${{ steps.proxy.outputs.proxy_pid }}" 2>/dev/null || true
+
+    - name: Post PR Comment
+      if: github.event_name == 'pull_request' && steps.proxy.outputs.proxy_started == 'true'
+      uses: actions/github-script@v7
+      env:
+        TOTAL: ${{ steps.stats.outputs.total || '0' }}
+        CACHE: ${{ steps.stats.outputs.cache || '0' }}
+        RULES: ${{ steps.stats.outputs.rules || '0' }}
+        LLM: ${{ steps.stats.outputs.llm || '0' }}
+        COST_WITHOUT: ${{ steps.stats.outputs.cost_without || '0.0000' }}
+        COST_WITH: ${{ steps.stats.outputs.cost_with || '0.0000' }}
+        SAVED: ${{ steps.stats.outputs.saved || '0.0000' }}
+        SAVINGS_PCT: ${{ steps.stats.outputs.savings_pct || '0' }}
+        HAS_DATA: ${{ steps.stats.outputs.has_data || 'false' }}
+        INPUT_GITHUB_TOKEN: ${{ inputs.github_token }}
+      with:
+        github-token: ${{ inputs.github_token }}
+        script: |
+          const total     = parseInt(process.env.TOTAL, 10);
+          const cache     = parseInt(process.env.CACHE, 10);
+          const rules     = parseInt(process.env.RULES, 10);
+          const llm       = parseInt(process.env.LLM, 10);
+          const costWithout = parseFloat(process.env.COST_WITHOUT);
+          const costWith    = parseFloat(process.env.COST_WITH);
+          const saved       = parseFloat(process.env.SAVED);
+          const savingsPct  = parseFloat(process.env.SAVINGS_PCT);
+          const hasData     = process.env.HAS_DATA === 'true';
+
+          function savingsBar(pct) {
+            const width = 20;
+            const filled = Math.round((pct / 100) * width);
+            const empty = width - filled;
+            return '\u2588'.repeat(filled) + '\u2591'.repeat(empty);
+          }
+
+          function pctOf(part, whole) {
+            if (whole === 0) return '0%';
+            return `${Math.round((part / whole) * 100)}%`;
+          }
+
+          const monthlySaved = (saved * 20).toFixed(2);
+
+          let body;
+
+          if (!hasData) {
+            body = [
+              '## \u{1F6E1}\uFE0F RuleShield Cost Report',
+              '',
+              '> No LLM requests were captured during this run.',
+              '> Make sure your test command sends requests through the RuleShield proxy at `http://localhost:${{ inputs.proxy_port }}/v1`.',
+              '',
+              '---',
+              '*Generated by [RuleShield](https://github.com/ruleshield/ruleshield-hermes)*',
+            ].join('\n');
+          } else {
+            body = [
+              '## \u{1F6E1}\uFE0F RuleShield Cost Report',
+              '',
+              `**${total}** LLM requests analyzed for this PR.`,
+              '',
+              '### Request Breakdown',
+              '',
+              '| Metric | Count | Share |',
+              '|--------|------:|------:|',
+              `| Cache Hits | ${cache} | ${pctOf(cache, total)} |`,
+              `| Rule Hits | ${rules} | ${pctOf(rules, total)} |`,
+              `| LLM Calls | ${llm} | ${pctOf(llm, total)} |`,
+              `| **Total** | **${total}** | **100%** |`,
+              '',
+              '### Cost Comparison',
+              '',
+              '| | Amount |',
+              '|--|-------:|',
+              `| Without RuleShield | $${costWithout.toFixed(4)} |`,
+              `| With RuleShield | $${costWith.toFixed(4)} |`,
+              `| **Saved** | **$${saved.toFixed(4)}** |`,
+              '',
+              '### Savings',
+              '',
+              '```',
+              `${savingsBar(savingsPct)} ${savingsPct.toFixed(1)}%`,
+              '```',
+              '',
+              savingsPct >= 50
+                ? `> **Great news!** RuleShield saved **${savingsPct.toFixed(1)}%** of your LLM costs on this run.`
+                : savingsPct >= 20
+                  ? `> RuleShield saved **${savingsPct.toFixed(1)}%** of your LLM costs. Savings improve as the cache warms up.`
+                  : `> RuleShield saved **${savingsPct.toFixed(1)}%** so far. Run more requests to build up the cache and rule matches.`,
+              '',
+              `**Projected monthly savings: ~$${monthlySaved}** *(based on 20 similar runs/month)*`,
+              '',
+              '---',
+              '*Generated by [RuleShield](https://github.com/ruleshield/ruleshield-hermes)*',
+            ].join('\n');
+          }
+
+          const commentTag = '<!-- ruleshield-cost-report -->';
+          body = commentTag + '\n' + body;
+
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+
+          const existing = comments.find(c => c.body && c.body.includes(commentTag));
+
+          if (existing) {
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: existing.id,
+              body,
+            });
+            core.info(`Updated existing comment ${existing.id}`);
+          } else {
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });
+            core.info('Created new PR comment');
+          }

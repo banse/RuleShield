@@ -1,0 +1,10 @@
+name: cost_report
+description: Show RuleShield cost savings summary
+version: 0.1.0
+author: RuleShield
+triggers:
+  - "show me my cost savings"
+  - "how much have I saved"
+  - "cost report"
+  - "savings report"
+  - "ruleshield stats"

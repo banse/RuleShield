@@ -1,0 +1,27 @@
+id: hermes_user_medium
+name: Hermes User Medium (Knowledge Worker)
+description: >
+  Medium Hermes-first training scenario.
+  Keeps prompts short/cheap but covers a wider set of rule families.
+max_prompts: 10
+steps:
+  - id: greeting
+    prompt: "hello"
+  - id: capabilities
+    prompt: "what can you do here?"
+  - id: status_ping
+    prompt: "status"
+  - id: list_files
+    prompt: "list files in this project"
+  - id: readme_brief
+    prompt: "read README.md and summarize in one sentence"
+  - id: run_confirm
+    prompt: "run ls in this project and confirm when done"
+  - id: show_changes
+    prompt: "show me what changed"
+  - id: explain_output
+    prompt: "explain what happened"
+  - id: repeat
+    prompt: "again please"
+  - id: confirmation
+    prompt: "ok continue"

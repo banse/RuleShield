@@ -1,0 +1,20 @@
+id: ruleshield_health_check
+name: RuleShield Health Check Baseline
+description: >
+  Initial reusable health-check scenario for RuleShield training/test runs.
+  Targets common intent families to quickly validate traffic, routing,
+  and baseline telemetry before larger scenarios.
+max_prompts: 6
+steps:
+  - id: status_ping
+    prompt: "status"
+  - id: list_files
+    prompt: "list files in this project"
+  - id: readme_summary
+    prompt: "read README.md and summarize it briefly"
+  - id: show_changes
+    prompt: "show me what changed"
+  - id: explain_output
+    prompt: "explain what happened"
+  - id: run_confirm
+    prompt: "run ls in this project and confirm when done"

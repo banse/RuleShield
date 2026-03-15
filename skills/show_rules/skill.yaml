@@ -1,0 +1,9 @@
+name: show_rules
+description: Show learned RuleShield rules
+version: 0.1.0
+author: RuleShield
+triggers:
+  - "what rules have you learned"
+  - "show me the rules"
+  - "show rules"
+  - "learned patterns"

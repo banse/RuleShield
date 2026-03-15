@@ -1,0 +1,554 @@
+[
+  {
+    "id": "code_run_tests",
+    "name": "Run Tests",
+    "description": "Detects requests to run test suites across various frameworks.",
+    "patterns": [
+      {"type": "contains", "value": "run tests", "field": "last_user_message"},
+      {"type": "contains", "value": "run the tests", "field": "last_user_message"},
+      {"type": "exact", "value": "pytest", "field": "last_user_message"},
+      {"type": "exact", "value": "npm test", "field": "last_user_message"},
+      {"type": "contains", "value": "run unit tests", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 30, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Running the test suite now. I'll detect the test framework from your project configuration and execute the appropriate command. Results will be displayed once complete, including any failures with file paths and line numbers.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.90,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_build_project",
+    "name": "Build Project",
+    "description": "Handles requests to build or compile the project.",
+    "patterns": [
+      {"type": "contains", "value": "build the project", "field": "last_user_message"},
+      {"type": "exact", "value": "npm run build", "field": "last_user_message"},
+      {"type": "exact", "value": "make", "field": "last_user_message"},
+      {"type": "contains", "value": "build this", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 30, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Starting the build process. I'll look for a build configuration (package.json, Makefile, CMakeLists.txt, etc.) in your project root and run the appropriate build command. I'll report any build errors with their locations.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.89,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_lint",
+    "name": "Lint Code",
+    "description": "Detects requests to lint or check code quality.",
+    "patterns": [
+      {"type": "contains", "value": "lint the code", "field": "last_user_message"},
+      {"type": "contains", "value": "run linter", "field": "last_user_message"},
+      {"type": "exact", "value": "ruff", "field": "last_user_message"},
+      {"type": "exact", "value": "eslint", "field": "last_user_message"},
+      {"type": "contains", "value": "check code quality", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 30, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Running the linter on your codebase. I'll use the linter configured in your project (ruff, eslint, pylint, etc.) and report any warnings or errors grouped by severity. Would you like me to auto-fix what I can?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.88,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_format",
+    "name": "Format Code",
+    "description": "Handles requests to format or auto-format source code.",
+    "patterns": [
+      {"type": "contains", "value": "format code", "field": "last_user_message"},
+      {"type": "contains", "value": "format the code", "field": "last_user_message"},
+      {"type": "exact", "value": "black", "field": "last_user_message"},
+      {"type": "exact", "value": "prettier", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 30, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Formatting your code now using the project's configured formatter. I'll respect any existing configuration files (.prettierrc, pyproject.toml, etc.) and report which files were modified.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.87,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_install_deps",
+    "name": "Install Dependencies",
+    "description": "Detects requests to install project dependencies.",
+    "patterns": [
+      {"type": "contains", "value": "install dependencies", "field": "last_user_message"},
+      {"type": "exact", "value": "pip install", "field": "last_user_message"},
+      {"type": "exact", "value": "npm install", "field": "last_user_message"},
+      {"type": "contains", "value": "install packages", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 35, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Installing project dependencies. I'll detect your package manager (pip, npm, yarn, cargo, etc.) from the project files and install accordingly. I'll let you know if there are any version conflicts or missing packages.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.88,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_compile",
+    "name": "Compile Code",
+    "description": "Handles requests to compile source code.",
+    "patterns": [
+      {"type": "contains", "value": "compile", "field": "last_user_message"},
+      {"type": "exact", "value": "tsc", "field": "last_user_message"},
+      {"type": "exact", "value": "gcc", "field": "last_user_message"},
+      {"type": "contains", "value": "compile the code", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 30, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Compiling your code. I'll use the appropriate compiler based on the file types in your project. Any compilation errors will be displayed with file names, line numbers, and suggested fixes.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.86,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_git_status",
+    "name": "Git Status",
+    "description": "Detects requests to check git status and show changes.",
+    "patterns": [
+      {"type": "exact", "value": "git status", "field": "last_user_message"},
+      {"type": "contains", "value": "show changes", "field": "last_user_message"},
+      {"type": "contains", "value": "what changed", "field": "last_user_message"},
+      {"type": "contains", "value": "modified files", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 30, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Checking the repository status. I'll show you staged changes, unstaged modifications, and untracked files along with a summary of insertions and deletions per file.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.92,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_git_commit",
+    "name": "Git Commit",
+    "description": "Handles requests to commit changes to git.",
+    "patterns": [
+      {"type": "exact", "value": "git commit", "field": "last_user_message"},
+      {"type": "contains", "value": "commit changes", "field": "last_user_message"},
+      {"type": "contains", "value": "commit this", "field": "last_user_message"},
+      {"type": "contains", "value": "make a commit", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 35, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I'll review the staged changes and create a commit with a descriptive message summarizing the modifications. Would you like to provide a specific commit message, or should I generate one based on the diff?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.89,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_git_push",
+    "name": "Git Push",
+    "description": "Detects requests to push commits to a remote repository.",
+    "patterns": [
+      {"type": "exact", "value": "git push", "field": "last_user_message"},
+      {"type": "contains", "value": "push to remote", "field": "last_user_message"},
+      {"type": "contains", "value": "push changes", "field": "last_user_message"},
+      {"type": "contains", "value": "push this", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 30, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Pushing your commits to the remote repository. I'll verify the remote is set and push to the current branch's upstream. If no upstream is configured, I'll set it with the -u flag.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.88,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_git_pull",
+    "name": "Git Pull",
+    "description": "Handles requests to pull updates from a remote repository.",
+    "patterns": [
+      {"type": "exact", "value": "git pull", "field": "last_user_message"},
+      {"type": "contains", "value": "update from remote", "field": "last_user_message"},
+      {"type": "contains", "value": "pull latest", "field": "last_user_message"},
+      {"type": "contains", "value": "pull changes", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 30, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Pulling the latest changes from the remote. I'll fetch and merge updates from the upstream branch. If there are merge conflicts, I'll list the conflicting files so we can resolve them together.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.87,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_git_branch",
+    "name": "Create Branch",
+    "description": "Detects requests to create a new git branch.",
+    "patterns": [
+      {"type": "contains", "value": "create branch", "field": "last_user_message"},
+      {"type": "contains", "value": "new branch", "field": "last_user_message"},
+      {"type": "contains", "value": "checkout -b", "field": "last_user_message"},
+      {"type": "contains", "value": "create a branch", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 45, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Creating a new branch. What would you like to name it? I recommend a convention like feature/description, fix/description, or chore/description based on the type of work.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.86,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_file_create",
+    "name": "Create File",
+    "description": "Handles requests to create a new file.",
+    "patterns": [
+      {"type": "contains", "value": "create file", "field": "last_user_message"},
+      {"type": "contains", "value": "new file", "field": "last_user_message"},
+      {"type": "startswith", "value": "touch", "field": "last_user_message"},
+      {"type": "contains", "value": "create a file", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 50, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I'll create the file for you. Please provide the file path and name. If you'd like, I can also add boilerplate content based on the file type (e.g., a Python class template, a React component skeleton).",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.85,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_file_delete",
+    "name": "Delete File",
+    "description": "Detects requests to delete or remove a file.",
+    "patterns": [
+      {"type": "contains", "value": "delete file", "field": "last_user_message"},
+      {"type": "contains", "value": "remove file", "field": "last_user_message"},
+      {"type": "startswith", "value": "rm ", "field": "last_user_message"},
+      {"type": "contains", "value": "delete this file", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 50, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Before deleting, I want to confirm: which file would you like removed? I'll check if any other files import or reference it to avoid breaking dependencies. The file will be moved to trash rather than permanently deleted.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.83,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_file_rename",
+    "name": "Rename File",
+    "description": "Handles requests to rename or move a file.",
+    "patterns": [
+      {"type": "contains", "value": "rename file", "field": "last_user_message"},
+      {"type": "contains", "value": "move file", "field": "last_user_message"},
+      {"type": "startswith", "value": "mv ", "field": "last_user_message"},
+      {"type": "contains", "value": "rename this", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 50, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I'll rename the file for you. Please provide the current file path and the new name. I'll also update any import statements and references across the project to reflect the new path.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.82,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_file_copy",
+    "name": "Copy File",
+    "description": "Detects requests to copy a file.",
+    "patterns": [
+      {"type": "contains", "value": "copy file", "field": "last_user_message"},
+      {"type": "contains", "value": "copy this file", "field": "last_user_message"},
+      {"type": "startswith", "value": "cp ", "field": "last_user_message"},
+      {"type": "contains", "value": "duplicate file", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 50, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I'll copy the file. Please specify the source file and the destination path. Would you like me to also update class names or identifiers in the copy to avoid naming conflicts?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.80,
+    "priority": 2,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_file_find",
+    "name": "Find File",
+    "description": "Handles requests to search for or locate files in the project.",
+    "patterns": [
+      {"type": "contains", "value": "find file", "field": "last_user_message"},
+      {"type": "contains", "value": "search for file", "field": "last_user_message"},
+      {"type": "contains", "value": "locate", "field": "last_user_message"},
+      {"type": "contains", "value": "where is the file", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 50, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I'll search the project for that file. What's the filename or pattern you're looking for? I can search by name, extension, or even by content within files using grep.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.82,
+    "priority": 2,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_debug_error",
+    "name": "Show Error",
+    "description": "Detects requests to view or explain error messages.",
+    "patterns": [
+      {"type": "contains", "value": "show error", "field": "last_user_message"},
+      {"type": "contains", "value": "what's the error", "field": "last_user_message"},
+      {"type": "contains", "value": "error log", "field": "last_user_message"},
+      {"type": "contains", "value": "show me the error", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 35, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "Let me pull up the error details. I'll check the terminal output, log files, and any recent stack traces. Once I have the error, I'll explain what it means and suggest a fix.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.86,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_debug_fix",
+    "name": "Fix Bug",
+    "description": "Handles requests to fix a bug or debug an issue.",
+    "patterns": [
+      {"type": "contains", "value": "fix this bug", "field": "last_user_message"},
+      {"type": "contains", "value": "debug this", "field": "last_user_message"},
+      {"type": "contains", "value": "fix this", "field": "last_user_message"},
+      {"type": "contains", "value": "fix the bug", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 30, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I'll analyze the issue and work on a fix. Let me examine the relevant code, understand the expected vs. actual behavior, and propose a solution. Can you point me to the file or describe the symptoms?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.84,
+    "priority": 4,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_debug_logging",
+    "name": "Add Logging",
+    "description": "Detects requests to add logging or print statements for debugging.",
+    "patterns": [
+      {"type": "contains", "value": "add logging", "field": "last_user_message"},
+      {"type": "contains", "value": "add print statement", "field": "last_user_message"},
+      {"type": "contains", "value": "add debug logging", "field": "last_user_message"},
+      {"type": "contains", "value": "add console.log", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 40, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I'll add logging statements to help trace the execution flow. I'll use the appropriate logging method for the language (logging module for Python, console.log for JS, etc.) and include relevant variable values at key decision points.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.82,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_debug_breakpoint",
+    "name": "Set Breakpoint",
+    "description": "Handles requests to set breakpoints or enter debug mode.",
+    "patterns": [
+      {"type": "contains", "value": "set breakpoint", "field": "last_user_message"},
+      {"type": "contains", "value": "debug mode", "field": "last_user_message"},
+      {"type": "contains", "value": "add breakpoint", "field": "last_user_message"},
+      {"type": "regex", "value": "(pdb|debugger|breakpoint\\(\\))", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 40, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I'll insert a breakpoint at the appropriate location. For Python I'll use breakpoint(), for JavaScript I'll use the debugger statement. Which file and function would you like me to add the breakpoint to?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.80,
+    "priority": 2,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_debug_stacktrace",
+    "name": "Stack Trace",
+    "description": "Detects requests to view or analyze a stack trace.",
+    "patterns": [
+      {"type": "contains", "value": "stack trace", "field": "last_user_message"},
+      {"type": "contains", "value": "traceback", "field": "last_user_message"},
+      {"type": "contains", "value": "call stack", "field": "last_user_message"},
+      {"type": "contains", "value": "show the traceback", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 35, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I'll locate and analyze the stack trace. I'll identify the root cause by reading from the bottom of the trace, highlight the relevant file and line number in your code, and explain what triggered the exception.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.85,
+    "priority": 3,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_quick_language",
+    "name": "Identify Language",
+    "description": "Handles questions about what programming language a file or project uses.",
+    "patterns": [
+      {"type": "contains", "value": "what language is this", "field": "last_user_message"},
+      {"type": "contains", "value": "file type", "field": "last_user_message"},
+      {"type": "contains", "value": "what language", "field": "last_user_message"},
+      {"type": "contains", "value": "which language", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 35, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I'll analyze the file extension, syntax patterns, and project configuration to identify the language. I can also detect the framework and major libraries in use based on the project structure and dependency files.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.84,
+    "priority": 2,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_quick_linecount",
+    "name": "Line Count",
+    "description": "Detects requests to count lines of code in files.",
+    "patterns": [
+      {"type": "contains", "value": "how many lines", "field": "last_user_message"},
+      {"type": "contains", "value": "line count", "field": "last_user_message"},
+      {"type": "contains", "value": "wc -l", "field": "last_user_message"},
+      {"type": "contains", "value": "count lines", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 40, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I'll count the lines for you. Would you like the total for a specific file, or a breakdown across the entire project? I can also exclude blank lines and comments if you want just the lines of actual code.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.78,
+    "priority": 1,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_quick_imports",
+    "name": "Show Imports",
+    "description": "Handles requests to display imports and dependencies of a file.",
+    "patterns": [
+      {"type": "contains", "value": "show imports", "field": "last_user_message"},
+      {"type": "contains", "value": "list imports", "field": "last_user_message"},
+      {"type": "contains", "value": "dependencies", "field": "last_user_message"},
+      {"type": "contains", "value": "what does this import", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 40, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I'll extract and display all import statements from the file. I'll organize them into standard library imports, third-party packages, and local project imports, and flag any unused imports I detect.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.81,
+    "priority": 2,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "code_quick_structure",
+    "name": "Project Structure",
+    "description": "Detects requests to display the project directory tree or structure.",
+    "patterns": [
+      {"type": "contains", "value": "project structure", "field": "last_user_message"},
+      {"type": "contains", "value": "directory tree", "field": "last_user_message"},
+      {"type": "contains", "value": "folder structure", "field": "last_user_message"},
+      {"type": "contains", "value": "show the structure", "field": "last_user_message"}
+    ],
+    "conditions": [
+      {"type": "max_length", "value": 40, "field": "last_user_message"}
+    ],
+    "response": {
+      "content": "I'll display the project's directory structure as a tree view, excluding common non-essential directories like node_modules, __pycache__, .git, and build artifacts. I'll highlight key files like entry points and configuration files.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.83,
+    "priority": 2,
+    "enabled": true,
+    "hit_count": 0
+  }
+]

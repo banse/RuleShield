@@ -1,0 +1,44 @@
+id: hermes_user_complex
+name: Hermes User Complex (Ops + Communication)
+description: >
+  Complex Hermes-first training scenario.
+  Prompt complexity stays low-cost, but coverage is broad with many intent families
+  and a few paraphrased repeats to strengthen rule training.
+max_prompts: 18
+steps:
+  - id: greeting
+    prompt: "hi"
+  - id: status_ping
+    prompt: "status"
+  - id: capabilities
+    prompt: "what can you do here?"
+  - id: list_files
+    prompt: "list files in this project"
+  - id: readme_brief
+    prompt: "read README.md briefly"
+  - id: run_confirm
+    prompt: "run ls in this project and confirm when done"
+  - id: show_changes
+    prompt: "show me what changed"
+  - id: explain_output
+    prompt: "explain what happened"
+  - id: retry
+    prompt: "please retry"
+  - id: repeat
+    prompt: "again please"
+  - id: clarification
+    prompt: "i mean only in this project"
+  - id: skip_next
+    prompt: "skip this and do next"
+  - id: wait_pause
+    prompt: "wait a second"
+  - id: simple_confirmation
+    prompt: "yes"
+  - id: save_request
+    prompt: "save this"
+  - id: undo_request
+    prompt: "undo that"
+  - id: simple_math
+    prompt: "what is 2+2"
+  - id: goodbye
+    prompt: "bye"

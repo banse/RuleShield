@@ -1,0 +1,22 @@
+{
+  "name": "@ruleshield/sdk",
+  "version": "0.2.0",
+  "description": "Drop-in OpenAI SDK wrapper that routes through RuleShield proxy",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist/"],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": ["openai", "llm", "cost-optimization", "proxy", "cache", "ruleshield"],
+  "license": "MIT",
+  "peerDependencies": {
+    "openai": ">=4.0.0"
+  },
+  "devDependencies": {
+    "openai": "^4.0.0",
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  }
+}

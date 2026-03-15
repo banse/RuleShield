@@ -1,0 +1,40 @@
+profiles:
+  - id: gpt5_mini_openai
+    label: GPT-5.1 Mini (OpenAI OAuth)
+    provider: openai_oauth
+    provider_label: OpenAI OAuth
+    model: gpt-5.1-codex-mini
+    fallback_model: gpt-4.1-mini
+    script_suffix: gpt5_mini_openai
+
+  - id: gpt5_max_openai
+    label: GPT-5.1 Max (OpenAI OAuth)
+    provider: openai_oauth
+    provider_label: OpenAI OAuth
+    model: gpt-5.1-codex-max
+    fallback_model: gpt-5.1-codex-mini
+    script_suffix: gpt5_max_openai
+
+  - id: gpt41_mini_openai
+    label: GPT-4.1 Mini (OpenAI OAuth)
+    provider: openai_oauth
+    provider_label: OpenAI OAuth
+    model: gpt-4.1-mini
+    fallback_model: gpt-5.1-codex-mini
+    script_suffix: gpt41_mini_openai
+
+  - id: openrouter_arcee_trinity_free
+    label: Arcee Trinity Large (OpenRouter Free)
+    provider: openrouter
+    provider_label: OpenRouter
+    model: arcee-ai/trinity-large-preview:free
+    fallback_model: stepfun/step-3.5-flash:free
+    script_suffix: openrouter_arcee_trinity_free
+
+  - id: openrouter_stepfun_flash_free
+    label: StepFun 3.5 Flash (OpenRouter Free)
+    provider: openrouter
+    provider_label: OpenRouter
+    model: stepfun/step-3.5-flash:free
+    fallback_model: arcee-ai/trinity-large-preview:free
+    script_suffix: openrouter_stepfun_flash_free

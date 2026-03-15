@@ -1,0 +1,19 @@
+id: hermes_user_short
+name: Hermes User Short (Daily Assistant)
+description: >
+  Short Hermes-first training scenario.
+  Uses only low-cost prompts and targets a small set of common rule families.
+max_prompts: 6
+steps:
+  - id: greeting
+    prompt: "hi"
+  - id: status_ping
+    prompt: "status"
+  - id: list_files
+    prompt: "list files in this project"
+  - id: readme_brief
+    prompt: "read README.md and summarize briefly"
+  - id: show_changes
+    prompt: "show me what changed"
+  - id: ack
+    prompt: "thanks"
