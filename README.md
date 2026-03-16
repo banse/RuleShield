@@ -4,11 +4,42 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/ruleshield)](https://pypi.org/project/ruleshield/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![CI](https://github.com/banse/ruleshield-hermes/actions/workflows/ci.yml/badge.svg)](https://github.com/banse/ruleshield-hermes/actions/workflows/ci.yml)
+[![CI](https://github.com/banse/RuleShield/actions/workflows/ci.yml/badge.svg)](https://github.com/banse/RuleShield/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-RuleShield is an intelligent LLM cost optimizer that sits between your Hermes Agent and any LLM provider. It learns your agent's patterns through 4 layers of defense, routes requests to the cheapest capable model, and improves its own rules through a feedback loop. Tested against the Nous Research API: **47-82% cost savings proven**.
+RuleShield is an intelligent LLM cost optimizer that sits between your Hermes Agent and any LLM provider. It learns your agent's patterns through 5 layers of defense, routes requests to the cheapest capable model, and improves its own rules through a feedback loop. Tested against the Nous Research API: **47-82% cost savings proven**.
+
+## Reviewer Quickstart
+
+The most reliable way to evaluate the current submission is the Hermes/OpenAI path.
+
+```bash
+git clone https://github.com/banse/RuleShield.git
+cd RuleShield
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .
+ruleshield init --hermes
+PYTHONPATH="$PWD" ./.venv/bin/python -m uvicorn ruleshield.proxy:app --host 127.0.0.1 --port 8337
+```
+
+In a second terminal:
+
+```bash
+cd RuleShield
+source .venv/bin/activate
+bash ./demo/test_training_health_check.sh
+```
+
+Recommended review path:
+- start the proxy with the `uvicorn` command above
+- use Hermes through the patched local config
+- run `demo/test_training_health_check.sh` first
+
+Notes:
+- this path expects local Hermes auth to already exist, typically via `~/.codex/auth.json`
+- the OpenAI/Hermes path is the primary demo path for this hackathon submission
 
 ## Quick Start
 
@@ -105,13 +136,13 @@ Two-tier caching that catches identical and near-identical requests.
 - **Exact match**: SHA-256 hash lookup. Same prompt = instant answer.
 - **Semantic match**: Sentence-transformer embeddings with cosine similarity (threshold 0.92). "What's the weather?" and "Tell me the weather" both hit cache.
 
-### Layer 2: SAP-Inspired Rule Engine ($0)
+### Layer 2: Weighted Rule Engine ($0)
 
-Pattern matching with weighted scoring, inspired by enterprise rule systems.
+Pattern matching with weighted scoring for common prompt families.
 
 - 75 rules across 4 packs: 8 default, 12 advanced, 30 customer support, 25 coding assistant
 - Pattern types: `exact`, `contains`, `startswith`, `regex`
-- SAP-inspired weighted keyword and regex scoring
+- Weighted keyword and regex scoring
 - Confidence levels: CONFIRMED / LIKELY / POSSIBLE
 - Auto-extraction generates new rules from observed traffic
 - Rules fire in under 2ms
@@ -186,7 +217,20 @@ Four tools available via JSON-RPC stdio for deep agent integration:
 
 ### Config Integration
 
-RuleShield patches your Hermes config automatically. Run `ruleshield init` and your `model.base_url` points to the proxy. No manual editing.
+RuleShield can patch your Hermes config automatically. Run `ruleshield init --hermes` and it will:
+
+- patch `~/.hermes/config.yaml` if it already exists
+- or create a minimal starter config for a blank local Hermes setup
+- point `model.base_url` at the RuleShield proxy
+
+Rollback:
+
+```bash
+ruleshield restore-hermes
+```
+
+Auth stays local. Typical local setups use either `~/.codex/auth.json`,
+`~/.hermes/.env`, or shell environment variables.
 
 ## Live Dashboard
 
@@ -296,7 +340,7 @@ ruleshield-hermes/
   ruleshield/
     proxy.py           # FastAPI proxy server (OpenAI-compatible, streaming)
     cache.py           # 2-layer cache (hash + semantic)
-    rules.py           # SAP-inspired pattern matching engine
+    rules.py           # Weighted pattern matching engine
     router.py          # Smart model router + complexity classifier
     hermes_bridge.py   # Local Hermes Agent bridge
     feedback.py        # Bandit-style feedback loop
@@ -330,7 +374,7 @@ ruleshield-hermes/
 - [x] Hermes Skills and config integration
 - [x] Prompt trimming
 - [x] MCP Server (4 tools)
-- [x] SAP-inspired weighted scoring
+- [x] Weighted scoring
 - [x] Web-based dashboard with real-time stats
 - [x] Template Optimizer with auto-discovery
 - [x] Auto Rule Activation (shadow -> production)
@@ -350,7 +394,7 @@ ruleshield-hermes/
 - [Contributing Guide](CONTRIBUTING.md) -- How to set up dev environment and contribute
 - [Code of Conduct](CODE_OF_CONDUCT.md) -- Our community standards
 - [Security Policy](SECURITY.md) -- How to report vulnerabilities
-- [Good First Issues](https://github.com/banse/ruleshield-hermes/labels/good%20first%20issue) -- Great starting points for contributors
+- [Good First Issues](https://github.com/banse/RuleShield/labels/good%20first%20issue) -- Great starting points for contributors
 
 ### Ways to contribute
 
