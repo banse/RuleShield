@@ -4,6 +4,7 @@
 	let direction = $state(1);
 	let transitioning = $state(false);
 	const totalSlides = 10;
+	const AUTO_ADVANCE_MS = 5000;
 
 	function goto(n: number) {
 		if (n < 0 || n >= totalSlides || transitioning) return;
@@ -32,6 +33,15 @@
 		return () => window.removeEventListener('keydown', onKey);
 	});
 
+	$effect(() => {
+		if (overview) return;
+		const timer = setInterval(() => {
+			if (transitioning || overview) return;
+			goto(current >= totalSlides - 1 ? 0 : current + 1);
+		}, AUTO_ADVANCE_MS);
+		return () => clearInterval(timer);
+	});
+
 	/* Animated counters */
 	let counterVisible: Record<number, boolean> = $state({});
 
@@ -41,14 +51,30 @@
 		counterVisible[c] = true;
 	});
 
-	function animateNumber(node: HTMLElement, { target, duration = 2000, prefix = '', suffix = '' }: { target: number; duration?: number; prefix?: string; suffix?: string }) {
+	function animateNumber(
+		node: HTMLElement,
+		{
+			target,
+			duration = 2000,
+			prefix = '',
+			suffix = '',
+			decimals = 0
+		}: { target: number; duration?: number; prefix?: string; suffix?: string; decimals?: number }
+	) {
 		const start = performance.now();
 		function tick() {
 			const elapsed = performance.now() - start;
 			const progress = Math.min(elapsed / duration, 1);
 			const eased = 1 - Math.pow(1 - progress, 3);
-			const value = Math.floor(target * eased);
-			node.textContent = prefix + value.toLocaleString() + suffix;
+			const value = target * eased;
+			const formatted =
+				decimals > 0
+					? value.toLocaleString(undefined, {
+							minimumFractionDigits: decimals,
+							maximumFractionDigits: decimals
+						})
+					: Math.floor(value).toLocaleString();
+			node.textContent = prefix + formatted + suffix;
 			if (progress < 1) requestAnimationFrame(tick);
 		}
 		tick();
@@ -114,9 +140,9 @@
 				<div class="big-number-container" class:visible={current === 1}>
 					<div class="big-number">
 						{#if current === 1}
-							<span use:animateNumber={{ target: 12847, prefix: '$', duration: 2000 }}>$0</span>
+							<span use:animateNumber={{ target: 420.69, prefix: '$', duration: 2000, decimals: 2 }}>$0</span>
 						{:else}
-							<span>$12,847</span>
+							<span>$420.69</span>
 						{/if}
 						<span class="big-number-unit">/ month</span>
 					</div>
@@ -154,10 +180,52 @@
 				</div>
 			</div>
 
-			<!-- SLIDE 3: The Solution -->
+			<!-- SLIDE 3: How RuleShield Saves Money -->
 			{:else if i === 2}
 			<div class="slide-content">
-				<h2 class="slide-heading">4-Layer Intelligence</h2>
+				<h2 class="slide-heading">How RuleShield Saves Money</h2>
+				<p class="lead-text">It removes unnecessary paid LLM calls before they happen.</p>
+
+				<div class="card-row">
+					<div class="problem-card">
+						<div class="card-icon">⚡</div>
+						<h3>Cache Hits</h3>
+						<code>same prompt again</code>
+						<div class="card-stats">
+							<span class="stat-cost">$0.00</span>
+							<span class="stat-freq">instant</span>
+						</div>
+					</div>
+					<div class="problem-card">
+						<div class="card-icon">🧠</div>
+						<h3>Rule Responses</h3>
+						<code>known intent pattern</code>
+						<div class="card-stats">
+							<span class="stat-cost">$0.00</span>
+							<span class="stat-freq">predictable</span>
+						</div>
+					</div>
+					<div class="problem-card">
+						<div class="card-icon">🛣️</div>
+						<h3>Smart Routing</h3>
+						<code>easy task -> cheaper model</code>
+						<div class="card-stats">
+							<span class="stat-cost">lower $/call</span>
+							<span class="stat-freq">auto</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="model-insight">
+					<p>Less passthrough to expensive models.</p>
+					<p>More responses handled at zero or lower cost.</p>
+				</div>
+			</div>
+
+			<!-- SLIDE 4: The Solution -->
+			{:else if i === 3}
+			<div class="slide-content">
+				<h2 class="slide-heading">RuleShield Intelligence Pipeline</h2>
 				<p class="lead-text">Intercept before it hits the LLM.</p>
 
 				<div class="layers-diagram">
@@ -198,10 +266,10 @@
 				</div>
 			</div>
 
-			<!-- SLIDE 4: One Command Setup -->
-			{:else if i === 3}
+			<!-- SLIDE 5: Two-Command Setup -->
+			{:else if i === 4}
 			<div class="slide-content center-content">
-				<h2 class="slide-heading">One Command Setup</h2>
+				<h2 class="slide-heading">Two-Command Setup</h2>
 
 				<div class="terminal">
 					<div class="terminal-bar">
@@ -213,17 +281,17 @@
 					<div class="terminal-body">
 						<div class="terminal-line">
 							<span class="term-prompt">$</span>
-							<span class="term-cmd">pip install ruleshield-hermes</span>
+							<span class="term-cmd">npm run setup:hermes</span>
 						</div>
 						<div class="terminal-line dim">
-							<span class="term-output">Successfully installed ruleshield-hermes-0.1.0</span>
+							<span class="term-output">RuleShield setup complete</span>
 						</div>
 						<div class="terminal-line" style="margin-top: 0.5rem">
 							<span class="term-prompt">$</span>
-							<span class="term-cmd">ruleshield init --hermes</span>
+							<span class="term-cmd">npm run start</span>
 						</div>
 						<div class="terminal-line">
-							<span class="term-output rich-green">&#10003; Detected Hermes Agent config</span>
+							<span class="term-output rich-green">&#10003; Gateway started on localhost:&lt;PORT&gt;</span>
 						</div>
 						<div class="terminal-line">
 							<span class="term-output rich-green">&#10003; Patched base_url &rarr; localhost:&lt;PORT&gt;</span>
@@ -246,8 +314,8 @@
 				</div>
 			</div>
 
-			<!-- SLIDE 5: Model-Aware Intelligence -->
-			{:else if i === 4}
+			<!-- SLIDE 6: Model-Aware Intelligence -->
+			{:else if i === 5}
 			<div class="slide-content">
 				<h2 class="slide-heading">Model-Aware Intelligence</h2>
 				<p class="lead-text">"Not all requests deserve the same model."</p>
@@ -294,55 +362,6 @@
 				<div class="model-insight">
 					<p>Expensive models get premium treatment.</p>
 					<p>Cheap models accept more rules.</p>
-				</div>
-			</div>
-
-			<!-- SLIDE 6: Proven Results -->
-			{:else if i === 5}
-			<div class="slide-content">
-				<h2 class="slide-heading">Proven Results</h2>
-				<p class="lead-text">Tested live against Nous Inference API</p>
-
-				<div class="results-hero" class:visible={current === 5}>
-					{#if current === 5}
-						<span class="results-number" use:animateNumber={{ target: 47, duration: 1500 }}>0</span>
-					{:else}
-						<span class="results-number">47</span>
-					{/if}
-					<span class="results-dash">&ndash;</span>
-					{#if current === 5}
-						<span class="results-number" use:animateNumber={{ target: 82, suffix: '%', duration: 1800 }}>0</span>
-					{:else}
-						<span class="results-number">82%</span>
-					{/if}
-					<span class="results-label">fewer LLM calls</span>
-				</div>
-
-				<div class="card-row results-cards">
-					<div class="result-card">
-						<div class="result-icon">🌅</div>
-						<h3>Morning Workflow</h3>
-						<div class="result-percent">47%</div>
-						<p class="result-detail">saved &middot; 19 requests</p>
-					</div>
-					<div class="result-card">
-						<div class="result-icon">💻</div>
-						<h3>Code Review</h3>
-						<div class="result-percent">60%</div>
-						<p class="result-detail">saved &middot; 13 requests</p>
-					</div>
-					<div class="result-card">
-						<div class="result-icon">🔬</div>
-						<h3>Research</h3>
-						<div class="result-percent">64%</div>
-						<p class="result-detail">saved &middot; 14 requests</p>
-					</div>
-					<div class="result-card">
-						<div class="result-icon">🔄</div>
-						<h3>Cron Tasks</h3>
-						<div class="result-percent">82%</div>
-						<p class="result-detail">saved &middot; 30 requests</p>
-					</div>
 				</div>
 			</div>
 
@@ -514,7 +533,7 @@
 						<div class="arch-bottom">
 							<div class="arch-dash-left">
 								<div class="arch-box-title">Web Dashboard</div>
-								<div class="arch-box-detail">:5173</div>
+								<div class="arch-box-detail">:5174</div>
 							</div>
 							<div class="arch-divider"></div>
 							<div class="arch-dash-right">
@@ -532,8 +551,8 @@
 				<h2 class="cta-heading">Try it now.</h2>
 
 				<div class="cta-commands">
-					<code>pip install ruleshield-hermes</code>
-					<code>ruleshield init --hermes</code>
+					<code>npm run setup:hermes</code>
+					<code>npm run start</code>
 				</div>
 
 				<a href="https://github.com/banse/RuleShield" class="cta-link" target="_blank" rel="noopener">

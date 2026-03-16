@@ -46,7 +46,7 @@
 <header class="border-b border-border px-8 py-5">
 	<div class="mx-auto flex max-w-[900px] items-center justify-between">
 		<div class="flex items-center gap-3">
-			<a href="/" class="flex items-center gap-3 transition-opacity hover:opacity-80">
+			<a href="/dashboard" class="flex items-center gap-3 transition-opacity hover:opacity-80">
 				<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/20">
 					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary">
 						<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
@@ -57,7 +57,7 @@
 			<span class="rounded-md bg-surface-elevated px-2 py-0.5 text-xs font-medium text-text-muted">Wrapped</span>
 		</div>
 		<a
-			href="/"
+			href="/dashboard"
 			class="flex items-center gap-1.5 rounded-md border border-border bg-surface-elevated px-3 py-1.5 text-xs font-medium text-text-secondary transition-all hover:border-primary/40 hover:text-primary"
 		>
 			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

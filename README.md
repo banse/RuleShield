@@ -45,9 +45,8 @@ npm run setup:hermes
 ## Alternative (pip / manual)
 
 ```bash
-pip install ruleshield-hermes
-ruleshield init
-ruleshield start
+npm run setup:hermes
+npm run start
 ```
 
 ### Drop-in SDK Wrapper
@@ -96,7 +95,6 @@ Terminal 2: cd dashboard && npm run dev
 |------|-----|-------------|
 | Dashboard | localhost:5174 | Real-time stats, requests, rules |
 | Rule Explorer | localhost:5174/rules | Toggle rules on/off, sort, filter |
-| Landing Page | localhost:5174/landing | Product marketing page |
 | Documentation | localhost:5174/docs | Architecture, API, Hermes guide |
 | Slides | localhost:5174/slides | 10-slide hackathon presentation |
 

@@ -174,7 +174,7 @@
 	<div class="mx-auto flex max-w-[1440px] items-center justify-between">
 		<div class="flex items-center gap-3">
 			<a
-				href="/"
+				href="/dashboard"
 				class="flex items-center gap-2 rounded-lg px-2 py-1 text-text-muted transition-colors hover:bg-surface-elevated hover:text-text-secondary"
 			>
 				<svg

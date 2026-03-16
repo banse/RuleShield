@@ -9,7 +9,7 @@ Every AI agent has a dirty secret: most of its API calls are wasted money. Run a
 RuleShield is a transparent proxy that sits between your Hermes Agent and any LLM. It learns your agent's patterns and intercepts the ones that do not need an LLM. A short setup, zero code changes, immediate savings.
 
 ```bash
-pip install ruleshield-hermes && ruleshield init --hermes && ruleshield start
+npm run setup:hermes && npm run start
 ```
 
 ## 5 Layers of Intelligence

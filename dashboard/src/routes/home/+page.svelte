@@ -19,9 +19,15 @@
 			label: 'Live Tools',
 			items: [
 				{
+					title: 'Test Monitor',
+					description: 'Start/stop test scripts and monitor prompt/response logs',
+					href: '/test-monitor',
+					color: 'warning'
+				},
+				{
 					title: 'Dashboard',
 					description: 'Real-time proxy stats, requests, savings',
-					href: '/',
+					href: '/dashboard',
 					color: 'accent'
 				},
 				{
@@ -49,12 +55,6 @@
 					color: 'accent'
 				},
 				{
-					title: 'Test Monitor',
-					description: 'Start/stop test scripts and monitor prompt/response logs',
-					href: '/test-monitor',
-					color: 'warning'
-				},
-				{
 					title: 'Config',
 					description: 'Minimal toggles for shadow mode, runtime switches, and rules',
 					href: '/config',
@@ -65,23 +65,6 @@
 					description: 'Monthly savings report with share feature',
 					href: '/wrapped',
 					color: 'accent'
-				}
-			]
-		},
-		{
-			label: 'Marketing',
-			items: [
-				{
-					title: 'Landing Page',
-					description: 'Product marketing page with 12 sections',
-					href: '/landing',
-					color: 'primary'
-				},
-				{
-					title: 'Presentation',
-					description: '10-slide hackathon deck with keyboard navigation',
-					href: '/slides',
-					color: 'primary'
 				}
 			]
 		},
@@ -113,39 +96,9 @@
 					color: 'primary'
 				},
 				{
-					title: 'Day-in-the-Life Guide',
-					description: 'Realistic shadow-mode test playbook for testers',
-					href: '/docs/day-in-life',
-					color: 'warning'
-				},
-				{
-					title: 'LangChain',
-					description: 'Integration guide with code examples',
-					href: '/docs/langchain',
-					color: 'accent'
-				},
-				{
-					title: 'CrewAI',
-					description: 'Multi-agent integration guide',
-					href: '/docs/crewai',
-					color: 'primary'
-				}
-			]
-		},
-		{
-			label: 'Project',
-			items: [
-				{
 					title: 'GitHub',
 					description: 'Source code, issues, and contributions',
 					href: 'https://github.com/banse/RuleShield',
-					color: 'warning',
-					external: true
-				},
-				{
-					title: 'PyPI',
-					description: 'Python package registry listing',
-					href: 'https://pypi.org/project/ruleshield',
 					color: 'warning',
 					external: true
 				},
@@ -190,8 +143,8 @@
 </script>
 
 <svelte:head>
-	<title>RuleShield Hermes - Navigation Hub</title>
-	<meta name="description" content="RuleShield Hermes - Open-Source LLM Cost Optimizer. Navigate all pages." />
+	<title>RuleShield - Navigation Hub</title>
+	<meta name="description" content="RuleShield - Open-Source LLM Cost Optimizer. Navigate all pages." />
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
 	<link
@@ -216,7 +169,6 @@
 				</div>
 				<h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
 					<span class="text-text-primary">Rule</span><span class="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Shield</span>
-					<span class="text-text-primary"> Hermes</span>
 				</h1>
 				<span class="rounded-md border border-border bg-surface px-2 py-0.5 font-mono text-xs font-medium text-text-muted">v0.2.0</span>
 			</div>

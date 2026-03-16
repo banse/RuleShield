@@ -21,8 +21,7 @@
 			title: 'Getting Started',
 			items: [
 				{ label: 'Quick Start', href: '/docs' },
-				{ label: 'Installation', href: '/docs#installation' },
-				{ label: 'Day In The Life Test', href: '/docs/day-in-life' }
+				{ label: 'Installation', href: '/docs#installation' }
 			]
 		},
 		{
@@ -87,7 +86,7 @@
 				Home
 			</a>
 			<a
-				href="/"
+				href="/dashboard"
 				class="flex items-center gap-2 text-text-muted hover:text-text-primary transition-colors text-sm mb-6"
 			>
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

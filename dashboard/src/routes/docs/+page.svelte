@@ -86,12 +86,14 @@ npm run start</pre>
 	<li>An API key for your LLM provider</li>
 </ul>
 
-<h3 class="docs-h3">Install from PyPI</h3>
-<pre class="docs-pre">pip install ruleshield-hermes</pre>
+<h3 class="docs-h3">Install with pip (from source)</h3>
+<pre class="docs-pre">git clone https://github.com/banse/RuleShield.git
+<span class="keyword">cd</span> RuleShield
+pip install <span class="flag">-e</span> .</pre>
 
 <h3 class="docs-h3">Install from source</h3>
 <pre class="docs-pre">git clone https://github.com/banse/RuleShield.git
-<span class="keyword">cd</span> ruleshield-hermes
+<span class="keyword">cd</span> RuleShield
 pip install <span class="flag">-e</span> .</pre>
 
 <h3 class="docs-h3">Set your API key</h3>
@@ -176,21 +178,6 @@ api_key: <span class="string">sk-your-key-here</span></pre>
 			<div>
 				<h3 class="text-text-primary font-semibold text-sm">MCP Server</h3>
 				<p class="text-text-muted text-xs mt-1">Tool inventory, JSON-RPC usage, and Hermes MCP configuration.</p>
-			</div>
-		</div>
-	</a>
-
-	<a href="/docs/day-in-life" class="docs-card block no-underline">
-		<div class="flex items-start gap-3">
-			<div class="text-primary text-xl mt-0.5">
-				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-						d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-				</svg>
-			</div>
-			<div>
-				<h3 class="text-text-primary font-semibold text-sm">Day-in-the-Life Test Guide</h3>
-				<p class="text-text-muted text-xs mt-1">Realistic shadow-mode test plan with prompt mix and operator checklist.</p>
 			</div>
 		</div>
 	</a>

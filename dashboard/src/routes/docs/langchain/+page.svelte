@@ -137,5 +137,5 @@ ruleshield stats</pre>
 
 <p class="docs-p">
 	This shows total requests, cache hit rate, rule matches, router decisions, and dollars saved.
-	You can also view this data in the <a href="/" class="docs-link">RuleShield Dashboard</a>.
+	You can also view this data in the <a href="/dashboard" class="docs-link">RuleShield Dashboard</a>.
 </p>

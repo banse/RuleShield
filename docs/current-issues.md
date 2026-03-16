@@ -221,6 +221,24 @@ Todo:
 - standardize runtime-config checks and explicit failure messages across scripts
 - ensure every script emits clear step boundaries and root-cause-first error output
 
+## 14. Validate and publish the intended pip install path
+
+Status: open (todo)
+
+What we observed:
+- direct install commands shown in UI/docs can drift from what is actually available on package indexes
+- a recent isolated check showed no matching distribution for `ruleshield` and `ruleshield-hermes` from pip
+- local source install (`pip install -e .`) works reliably for now
+
+Why this matters:
+- install commands in marketing/docs must be executable as-is
+- broken pip instructions reduce reviewer trust and slow first-time setup
+
+Todo:
+- verify which package name should be published (`ruleshield` vs `ruleshield-hermes`)
+- check PyPI availability and version visibility before documenting a PyPI command
+- keep UI/docs on `pip install -e .` until PyPI install is confirmed end-to-end
+
 ## Suggested next priorities
 
 1. Fix gateway stability during training runs.

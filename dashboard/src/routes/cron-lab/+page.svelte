@@ -525,7 +525,7 @@
 
 			<div class="flex items-center gap-3">
 				<a
-					href="/"
+					href="/dashboard"
 					class="rounded-lg border border-border bg-surface px-3 py-2 text-xs font-medium text-text-secondary transition-colors hover:border-primary/40 hover:text-primary"
 				>
 					Main Dashboard
