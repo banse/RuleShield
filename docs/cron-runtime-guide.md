@@ -19,7 +19,7 @@ RuleShield does not own your scheduler in V1. It exposes a stable compact execut
 Once a profile is active, execute it with:
 
 ```bash
-curl -s -X POST http://127.0.0.1:8337/api/cron-profiles/<profile_id>/execute \
+curl -s -X POST http://127.0.0.1:8347/api/cron-profiles/<profile_id>/execute \
   -H 'content-type: application/json' \
   -d '{"payload_text":"<dynamic content here>"}'
 ```
@@ -54,7 +54,7 @@ Product:
 """.strip()
 
 res = requests.post(
-    "http://127.0.0.1:8337/api/cron-profiles/daily_digest_abcd1234/execute",
+    "http://127.0.0.1:8347/api/cron-profiles/daily_digest_abcd1234/execute",
     json={"payload_text": payload_text},
     timeout=30,
 )
@@ -75,7 +75,7 @@ agent = AIAgent(quiet_mode=True, skip_memory=True, skip_context_files=True)
 
 payload_text = "Normalized email bundle here"
 response = requests.post(
-    "http://127.0.0.1:8337/api/cron-profiles/daily_digest_abcd1234/execute",
+    "http://127.0.0.1:8347/api/cron-profiles/daily_digest_abcd1234/execute",
     json={"payload_text": payload_text},
     timeout=30,
 ).json()

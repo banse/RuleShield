@@ -85,7 +85,7 @@ env RULESHIELD_SHADOW_MODE=true ./.venv/bin/python -m ruleshield.proxy
 Run Hermes through the proxy:
 
 ```bash
-HERMES_CODEX_BASE_URL=http://127.0.0.1:8337 hermes
+HERMES_CODEX_BASE_URL=http://127.0.0.1:8347 hermes
 ```
 
 ### Dashboard
@@ -115,7 +115,7 @@ sqlite3 ~/.ruleshield/cache.db "DELETE FROM shadow_log;"
 After reset, verify:
 
 ```bash
-curl -s 'http://127.0.0.1:8337/api/shadow?recent=25'
+curl -s 'http://127.0.0.1:8347/api/shadow?recent=25'
 ```
 
 Expected:

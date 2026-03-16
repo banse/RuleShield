@@ -85,7 +85,7 @@ The `Settings` dataclass (line ~31) already supports `provider_url`. Ollama user
    ```
 4. Send a test request:
    ```bash
-   curl http://localhost:8337/v1/chat/completions \
+   curl http://localhost:8347/v1/chat/completions \
      -H "Content-Type: application/json" \
      -d '{"model": "llama3.1:8b", "messages": [{"role": "user", "content": "hello"}]}'
    ```

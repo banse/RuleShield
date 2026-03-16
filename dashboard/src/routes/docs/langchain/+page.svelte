@@ -19,15 +19,13 @@
 <p class="docs-p">Get RuleShield optimizing your LangChain calls in three steps.</p>
 
 <h3 class="docs-h3">Step 1: Install</h3>
-<pre class="docs-pre"><span class="comment"># Install RuleShield and LangChain</span>
-pip install ruleshield-hermes langchain-openai</pre>
+<pre class="docs-pre"><span class="comment"># Setup RuleShield (Hermes flow) and install LangChain client</span>
+npm run setup:hermes
+pip install langchain-openai</pre>
 
 <h3 class="docs-h3">Step 2: Initialize RuleShield</h3>
-<pre class="docs-pre"><span class="comment"># Create config and default rules</span>
-ruleshield init
-
-<span class="comment"># Start the proxy</span>
-ruleshield start</pre>
+<pre class="docs-pre"><span class="comment"># Start the proxy</span>
+npm run start</pre>
 
 <h3 class="docs-h3">Step 3: Configure LangChain</h3>
 <pre class="docs-pre"><span class="keyword">from</span> langchain_openai <span class="keyword">import</span> ChatOpenAI

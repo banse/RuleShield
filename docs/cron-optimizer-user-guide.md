@@ -16,7 +16,7 @@ It works in stages:
 
 ## Prerequisites
 
-- RuleShield proxy running on `http://127.0.0.1:8337`
+- RuleShield proxy running on `http://127.0.0.1:8347`
 - Hermes routed through RuleShield
 - request history in `request_log` (so recurring workflows can be detected)
 
@@ -69,7 +69,7 @@ If blocked:
 For runtime calls, send only dynamic payload:
 
 ```bash
-curl -s -X POST http://127.0.0.1:8337/api/cron-profiles/<profile_id>/execute \
+curl -s -X POST http://127.0.0.1:8347/api/cron-profiles/<profile_id>/execute \
   -H 'content-type: application/json' \
   -d '{"payload_text":"<dynamic content>"}'
 ```

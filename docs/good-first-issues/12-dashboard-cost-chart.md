@@ -28,7 +28,7 @@ The cost trend chart should be inserted as a new section between the savings pan
 
 **File:** `dashboard/src/routes/+page.server.ts`
 
-This file fetches data from the RuleShield proxy API. You will need to add a new API call to fetch daily cost data. The proxy API base is `http://localhost:8337`.
+This file fetches data from the RuleShield proxy API. You will need to add a new API call to fetch daily cost data. The proxy API base is `http://localhost:8347`.
 
 ### Proxy API
 

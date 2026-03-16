@@ -20,15 +20,13 @@
 <p class="docs-p">Get RuleShield running with CrewAI in three steps.</p>
 
 <h3 class="docs-h3">Step 1: Install</h3>
-<pre class="docs-pre"><span class="comment"># Install RuleShield and CrewAI</span>
-pip install ruleshield-hermes crewai</pre>
+<pre class="docs-pre"><span class="comment"># Setup RuleShield (Hermes flow) and install CrewAI</span>
+npm run setup:hermes
+pip install crewai</pre>
 
 <h3 class="docs-h3">Step 2: Initialize RuleShield</h3>
-<pre class="docs-pre"><span class="comment"># Create config and default rules</span>
-ruleshield init
-
-<span class="comment"># Start the proxy</span>
-ruleshield start</pre>
+<pre class="docs-pre"><span class="comment"># Start the proxy</span>
+npm run start</pre>
 
 <h3 class="docs-h3">Step 3: Configure CrewAI</h3>
 <pre class="docs-pre"><span class="keyword">import</span> os

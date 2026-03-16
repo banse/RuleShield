@@ -29,7 +29,7 @@ The docs layout with sidebar navigation is at `dashboard/src/routes/docs/+layout
 
 **File:** `ruleshield/proxy.py`
 
-RuleShield runs on `localhost:8337` by default and exposes `/v1/chat/completions` (OpenAI-compatible).
+RuleShield runs on `localhost:8347` by default and exposes `/v1/chat/completions` (OpenAI-compatible).
 
 ## What to build
 
@@ -53,7 +53,7 @@ from crewai import Agent, Task, Crew, LLM
 # Point CrewAI at the RuleShield proxy
 llm = LLM(
     model="openai/gpt-4o",
-    base_url="http://localhost:8337/v1",  # RuleShield proxy
+    base_url="http://localhost:8347/v1",  # RuleShield proxy
     api_key=os.getenv("OPENAI_API_KEY"),
 )
 

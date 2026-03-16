@@ -28,7 +28,7 @@ The docs layout is at `dashboard/src/routes/docs/+layout.svelte`.
 
 **File:** `ruleshield/proxy.py`
 
-RuleShield exposes an OpenAI-compatible endpoint at `/v1/chat/completions`. The proxy runs on `localhost:8337` by default (configurable via `RULESHIELD_PORT` env var or `~/.ruleshield/config.yaml`).
+RuleShield exposes an OpenAI-compatible endpoint at `/v1/chat/completions`. The proxy runs on `localhost:8347` by default (configurable via `RULESHIELD_PORT` env var or `~/.ruleshield/config.yaml`).
 
 ### How the proxy works
 
@@ -41,7 +41,7 @@ Create a new Svelte page at `dashboard/src/routes/docs/langchain/+page.svelte` w
 ### Guide outline
 
 1. **Prerequisites** -- RuleShield running (`ruleshield start`), LangChain installed
-2. **Method 1: Environment variable** -- Set `OPENAI_BASE_URL=http://localhost:8337/v1`
+2. **Method 1: Environment variable** -- Set `OPENAI_BASE_URL=http://localhost:8347/v1`
 3. **Method 2: Constructor parameter** -- Pass `base_url` to `ChatOpenAI()`
 4. **Full working example** -- A complete Python script that builds a simple chain
 5. **Verifying it works** -- How to check `ruleshield stats` to confirm requests are being intercepted
@@ -56,7 +56,7 @@ from langchain_core.prompts import ChatPromptTemplate
 # Point LangChain at the RuleShield proxy
 llm = ChatOpenAI(
     model="gpt-4o",
-    base_url="http://localhost:8337/v1",  # RuleShield proxy
+    base_url="http://localhost:8347/v1",  # RuleShield proxy
     api_key="your-openai-api-key",        # Still needs a real API key for passthrough
 )
 

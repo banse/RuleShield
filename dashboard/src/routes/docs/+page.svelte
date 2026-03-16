@@ -18,29 +18,26 @@
 <!-- Quick Start -->
 <h2 class="docs-h2">Quick Start</h2>
 
-<p class="docs-p">Get RuleShield running in three commands.</p>
+<p class="docs-p">Get RuleShield running with the npm setup flow.</p>
 
 <h3 class="docs-h3">Step 1: Install</h3>
-<pre class="docs-pre"><span class="comment"># Install via pip</span>
-pip install ruleshield-hermes</pre>
-
-<h3 class="docs-h3">Step 2: Initialize</h3>
-<pre class="docs-pre"><span class="comment"># Create config, install default rules, optionally configure Hermes</span>
-ruleshield init <span class="flag">--hermes</span></pre>
+<pre class="docs-pre"><span class="comment"># Clone and run guided Hermes setup</span>
+git clone https://github.com/banse/RuleShield.git
+<span class="keyword">cd</span> RuleShield
+npm run setup:hermes</pre>
 
 <p class="docs-p">
 	This creates <code class="docs-code">~/.ruleshield/</code> with your configuration file and
-	default rule set. The <code class="docs-code">--hermes</code> flag automatically patches your
-	Hermes Agent config to route through the proxy.
+	default rule set and patches your Hermes Agent config to route through the proxy.
 </p>
 
-<h3 class="docs-h3">Step 3: Start</h3>
+<h3 class="docs-h3">Step 2: Start</h3>
 <pre class="docs-pre"><span class="comment"># Start the proxy server</span>
-ruleshield start</pre>
+npm run start</pre>
 
 <p class="docs-p">
-	Point your Hermes Agent at <code class="docs-code">http://127.0.0.1:&lt;PORT&gt;</code>
-	(or your configured gateway URL).
+	Open <code class="docs-code">http://127.0.0.1:8347/test-monitor</code> (temporary default start page)
+	and run your demo/test scripts from a second terminal.
 	Costs drop immediately. No code changes needed.
 </p>
 

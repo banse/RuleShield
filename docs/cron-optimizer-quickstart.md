@@ -10,7 +10,7 @@ ruleshield start
 
 Expected:
 
-- proxy is reachable on `http://127.0.0.1:8337`
+- proxy is reachable on `http://127.0.0.1:8347`
 - dashboard is reachable on your local dashboard port
 
 ## 2) Open Cron Lab
@@ -60,7 +60,7 @@ If guardrails block activation:
 For active profiles, run with payload:
 
 ```bash
-curl -s -X POST http://127.0.0.1:8337/api/cron-profiles/<profile_id>/execute \
+curl -s -X POST http://127.0.0.1:8347/api/cron-profiles/<profile_id>/execute \
   -H 'content-type: application/json' \
   -d '{"payload_text":"<dynamic payload>"}'
 ```
