@@ -196,6 +196,7 @@ def start(port: int | None, daemon: bool) -> None:
 
     print_startup_banner()
 
+    console.print("  Website:        [bold cyan]https://vibingco.de[/bold cyan]")
     console.print(f"  Proxy running on [bold cyan]http://localhost:{settings.port}[/bold cyan]")
     console.print(f"  Main page:      [bold cyan]http://127.0.0.1:5174/[/bold cyan]")
     console.print(f"  Training monitor: [bold cyan]http://127.0.0.1:5174/test-monitor[/bold cyan]")

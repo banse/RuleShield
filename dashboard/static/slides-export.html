@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RuleShield - Slides Export</title>
+  <meta name="description" content="Standalone RuleShield slides export." />
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --border: #2a2a3c;
+      --primary: #6c5ce7;
+      --accent: #00d4aa;
+      --warning: #ffb84d;
+      --text: #f0f0f5;
+      --muted: #a0a0b8;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      overflow: hidden;
+    }
+    .deck {
+      position: relative;
+      height: 100vh;
+      width: 100vw;
+      background:
+        radial-gradient(1000px 500px at 50% -10%, rgba(108,92,231,.18), transparent 70%),
+        radial-gradient(700px 400px at 90% 110%, rgba(0,212,170,.16), transparent 65%),
+        var(--bg);
+    }
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 6vh 8vw;
+      opacity: 0;
+      transform: translateX(30px);
+      transition: opacity .45s ease, transform .45s ease;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+    }
+    .slide.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+    .card {
+      width: min(1100px, 100%);
+      border: 1px solid var(--border);
+      background: rgba(18,18,26,.88);
+      border-radius: 18px;
+      padding: 28px 34px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    }
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+    h1, h2 { margin: 0 0 12px; line-height: 1.1; }
+    h1 { font-size: clamp(40px, 8vw, 88px); font-weight: 800; }
+    h2 { font-size: clamp(30px, 5vw, 58px); font-weight: 760; }
+    .subtitle {
+      font-size: clamp(18px, 2vw, 26px);
+      color: var(--accent);
+      margin-bottom: 18px;
+    }
+    .lead {
+      font-size: clamp(15px, 1.6vw, 21px);
+      color: var(--muted);
+      line-height: 1.55;
+      max-width: 1000px;
+    }
+    .grid3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .mini {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      background: #0f1019;
+    }
+    .mini b { color: var(--text); display: block; margin-bottom: 6px; }
+    .mini span { color: var(--muted); font-size: 14px; }
+    .code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: #090b15;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: var(--accent);
+      margin-top: 12px;
+      white-space: pre-wrap;
+    }
+    .counter {
+      position: fixed;
+      right: 16px;
+      top: 14px;
+      font-size: 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 10px;
+      color: var(--muted);
+      background: rgba(18,18,26,.8);
+      z-index: 10;
+    }
+    .nav {
+      position: fixed;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+    .nav button {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      border: 0;
+      background: #3f4060;
+      cursor: pointer;
+      padding: 0;
+    }
+    .nav button.active { background: var(--accent); box-shadow: 0 0 12px rgba(0,212,170,.6); }
+    .hint {
+      position: fixed;
+      left: 16px;
+      bottom: 12px;
+      color: #7d7d98;
+      font-size: 12px;
+      z-index: 10;
+    }
+    .brand {
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    @media (max-width: 900px) {
+      .grid3 { grid-template-columns: 1fr; }
+      .card { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="deck">
+    <div class="counter" id="counter">1 / 10</div>
+
+    <section class="slide active">
+      <div class="card">
+        <div class="kicker"><span class="dot"></span> Hermes Agent Hackathon 2026</div>
+        <h1><span class="brand">RuleShield</span></h1>
+        <p class="subtitle">The Agent That Optimizes Itself</p>
+        <p class="lead">Built for Hermes Agent by NousResearch.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="card">
+        <div class="kicker"><span class="dot"></span> Slide 2</div>
+        <h2>The Problem</h2>
+        <p class="subtitle">$420.69 / month wasted on repetition</p>
+        <p class="lead">Many agent prompts are repeated patterns: greetings, status checks, and confirmations still hitting paid LLM paths.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="card">
+        <div class="kicker"><span class="dot"></span> Slide 3</div>
+        <h2>How RuleShield saves YOU money</h2>
+        <p class="lead">It removes unnecessary paid calls before they happen.</p>
+        <div class="grid3">
+          <div class="mini"><b>Cache Hits</b><span>Repeated prompts return at $0.00</span></div>
+          <div class="mini"><b>Rule Responses</b><span>Known intent patterns resolve at $0.00</span></div>
+          <div class="mini"><b>Smart Routing</b><span>Easy tasks go to cheaper models automatically</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="card">
+        <div class="kicker"><span class="dot"></span> Slide 4</div>
+        <h2>RuleShield Intelligence Pipeline</h2>
+        <p class="lead">Intercept before expensive inference: Cache -> Rules -> Bridge -> Router -> LLM.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="card">
+        <div class="kicker"><span class="dot"></span> Slide 5</div>
+        <h2>Two-Command Setup</h2>
+        <div class="code">npm run setup:hermes
+npm run start</div>
+        <p class="lead">That is it. Hermes traffic routes through RuleShield.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="card">
+        <div class="kicker"><span class="dot"></span> Slide 6</div>
+        <h2>Model-Aware Intelligence</h2>
+        <p class="lead">Not all requests deserve the same model. Cheap paths for simple intent, premium paths for complex reasoning.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="card">
+        <div class="kicker"><span class="dot"></span> Slide 7</div>
+        <h2>Deep Hermes Integration</h2>
+        <p class="lead">Hermes Skill + MCP server + feedback loop for iterative optimization.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="card">
+        <div class="kicker"><span class="dot"></span> Slide 8</div>
+        <h2>Self-Evolution Path</h2>
+        <p class="lead">Now -> Next -> Future: from direct cost optimization to adaptive policy refinement.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="card">
+        <div class="kicker"><span class="dot"></span> Slide 9</div>
+        <h2>Architecture</h2>
+        <p class="lead">Hermes Agent on top, RuleShield Proxy in the middle, dashboard/monitoring around it, upstream LLM behind it.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="card">
+        <div class="kicker"><span class="dot"></span> Slide 10</div>
+        <h2>Try it now</h2>
+        <div class="code">npm run setup:hermes
+npm run start</div>
+        <p class="lead">github.com/banse/RuleShield</p>
+      </div>
+    </section>
+
+    <div class="nav" id="nav"></div>
+    <div class="hint">Arrow keys to navigate • Auto-advance every 5s</div>
+  </div>
+
+  <script>
+    (() => {
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      const nav = document.getElementById('nav');
+      const counter = document.getElementById('counter');
+      const AUTO_MS = 5000;
+      let idx = 0;
+      let timer = null;
+
+      function renderDots() {
+        nav.innerHTML = '';
+        slides.forEach((_, i) => {
+          const b = document.createElement('button');
+          if (i === idx) b.classList.add('active');
+          b.addEventListener('click', () => { idx = i; render(); resetTimer(); });
+          nav.appendChild(b);
+        });
+      }
+
+      function render() {
+        slides.forEach((el, i) => el.classList.toggle('active', i === idx));
+        counter.textContent = `${idx + 1} / ${slides.length}`;
+        renderDots();
+      }
+
+      function next() { idx = (idx + 1) % slides.length; render(); }
+      function prev() { idx = (idx - 1 + slides.length) % slides.length; render(); }
+
+      function resetTimer() {
+        if (timer) clearInterval(timer);
+        timer = setInterval(next, AUTO_MS);
+      }
+
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); resetTimer(); }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); resetTimer(); }
+      });
+
+      render();
+      resetTimer();
+    })();
+  </script>
+</body>
+</html>

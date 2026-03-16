@@ -135,7 +135,7 @@
 			{:else if i === 1}
 			<div class="slide-content">
 				<h2 class="slide-heading">The Problem</h2>
-				<p class="lead-text">Every Hermes Agent call costs money.<br><span class="text-accent">60-80% are repetitive patterns.</span></p>
+				<p class="lead-text">Every agent call costs money.<br><span class="text-accent">60-80% are repetitive patterns.</span></p>
 
 				<div class="big-number-container" class:visible={current === 1}>
 					<div class="big-number">
@@ -180,10 +180,10 @@
 				</div>
 			</div>
 
-			<!-- SLIDE 3: How RuleShield Saves Money -->
+			<!-- SLIDE 3: How RuleShield Saves YOU Money -->
 			{:else if i === 2}
 			<div class="slide-content">
-				<h2 class="slide-heading">How RuleShield Saves Money</h2>
+				<h2 class="slide-heading">How RuleShield Saves YOU Money</h2>
 				<p class="lead-text">It removes unnecessary paid LLM calls before they happen.</p>
 
 				<div class="card-row">
