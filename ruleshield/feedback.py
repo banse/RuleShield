@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS rule_events (
 """
 
 # Migration statements to add per-component columns to an existing table
-# that was created before the SAP-pattern upgrade.
+# that was created before the per-component upgrade.
 _MIGRATIONS_COMPONENT_COLUMNS = [
     "ALTER TABLE rule_feedback ADD COLUMN classification_correct BOOLEAN",
     "ALTER TABLE rule_feedback ADD COLUMN response_helpful BOOLEAN",
@@ -100,8 +100,8 @@ class RuleFeedback:
     async def init(self) -> None:
         """Open the database and create the feedback table if it does not exist.
 
-        Also runs migrations to add per-component tracking columns (SAP
-        pattern) when upgrading an existing database.
+        Also runs migrations to add per-component tracking columns when
+        upgrading an existing database.
         """
         db_dir = os.path.dirname(self.db_path)
         os.makedirs(db_dir, exist_ok=True)
@@ -142,7 +142,7 @@ class RuleFeedback:
         correction or complaint, the previous rule response is implicitly
         accepted.
 
-        Per-component tracking (SAP pattern):
+        Per-component tracking:
           *classification_correct* -- was the right rule matched?
           *response_helpful* -- was the response useful to the user?
           *confidence_appropriate* -- was the confidence level reasonable?
@@ -189,7 +189,7 @@ class RuleFeedback:
              the LLM response for the same prompt.
           2. The user explicitly corrects the answer (e.g. "no, that's wrong").
 
-        Per-component tracking (SAP pattern):
+        Per-component tracking:
           *classification_correct* -- was the right rule matched?
           *response_helpful* -- was the response useful to the user?
           *confidence_appropriate* -- was the confidence level reasonable?
@@ -474,14 +474,14 @@ class RuleFeedback:
             logger.exception("Failed to write rule event for %s", rule_id)
 
     # ------------------------------------------------------------------
-    # Analytics (SAP enterprise pattern)
+    # Analytics helpers
     # ------------------------------------------------------------------
 
     async def get_underperforming_rules(
         self,
         min_feedback: int = 5,
     ) -> list[dict[str, Any]]:
-        """Find rules with low accuracy (SAP analytics pattern).
+        """Find rules with low accuracy.
 
         Returns rules where:
           - Total feedback >= *min_feedback* (ensures statistical relevance).
@@ -539,7 +539,7 @@ class RuleFeedback:
         return results
 
     async def get_performance_by_category(self) -> dict[str, dict[str, Any]]:
-        """Group feedback by rule category / ID prefix (SAP analytics pattern).
+        """Group feedback by rule category / ID prefix.
 
         Uses the portion of the rule_id before the first underscore as the
         category name (e.g. ``greeting_simple`` -> ``greeting``).  This gives
@@ -595,7 +595,7 @@ class RuleFeedback:
         return categories
 
     async def get_component_accuracy(self) -> dict[str, dict[str, float]]:
-        """Return per-component accuracy across all rules (SAP pattern).
+        """Return per-component accuracy across all rules.
 
         Analyses the boolean component columns (classification_correct,
         response_helpful, confidence_appropriate) to identify which
@@ -852,7 +852,7 @@ class RuleFeedback:
     async def _run_migrations(self) -> None:
         """Apply schema migrations for existing databases.
 
-        Adds per-component tracking columns (SAP pattern) that may not
+        Adds per-component tracking columns that may not
         exist in databases created before this upgrade.  Each ALTER TABLE
         is wrapped in a try/except so that already-migrated databases
         proceed without error.

@@ -20,6 +20,7 @@ import yaml
 
 RULESHIELD_DIR = Path.home() / ".ruleshield"
 CONFIG_PATH = RULESHIELD_DIR / "config.yaml"
+HERMES_DIR = Path.home() / ".hermes"
 HERMES_CONFIG_PATH = Path.home() / ".hermes" / "config.yaml"
 
 # ---------------------------------------------------------------------------
@@ -33,7 +34,7 @@ class Settings:
 
     provider_url: str = "https://api.openai.com"
     api_key: str = ""
-    port: int = 8337
+    port: int = 8347
     cache_enabled: bool = True
     rules_enabled: bool = True
     shadow_mode: bool = False
@@ -153,7 +154,7 @@ def write_default_config() -> Path:
 
 
 def detect_hermes_config() -> dict[str, Any] | None:
-    """Read and return the Hermes cli-config.yaml if it exists."""
+    """Read and return the Hermes config if it exists."""
     if not HERMES_CONFIG_PATH.exists():
         return None
     try:
@@ -163,34 +164,52 @@ def detect_hermes_config() -> dict[str, Any] | None:
         return None
 
 
-def patch_hermes_config(proxy_url: str = "http://127.0.0.1:8337/v1") -> bool:
-    """Point Hermes at the RuleShield proxy.
+def ensure_hermes_config(proxy_url: str = "http://127.0.0.1:8347/v1") -> dict[str, Any]:
+    """Create or patch Hermes config to point at the RuleShield proxy.
 
-    Patches model.base_url in ~/.hermes/config.yaml.
-    Saves the original base_url so it can be restored later.
+    Returns a small status object:
 
-    Returns True on success, False if Hermes config was not found.
+    {
+        "ok": bool,
+        "status": "created" | "patched" | "unchanged" | "error",
+        "path": "...",
+    }
     """
-    cfg = detect_hermes_config()
-    if cfg is None:
-        return False
+    created = not HERMES_CONFIG_PATH.exists()
+    cfg = detect_hermes_config() or {}
+    if not isinstance(cfg, dict):
+        cfg = {}
 
-    model = cfg.get("model", {})
-    original_url = model.get("base_url", "")
+    model = cfg.get("model")
+    if not isinstance(model, dict):
+        model = {}
 
-    # Save original for restore
-    _save_original_hermes_url(original_url)
+    original_url = str(model.get("base_url", "") or "").strip()
+    if original_url and original_url != proxy_url:
+        _save_original_hermes_url(original_url)
+
+    if created:
+        # Minimal Hermes starter profile for a blank local setup.
+        model.setdefault("default", "gpt-5.1-codex-mini")
+        model.setdefault("provider", "openai-codex")
+        cfg.setdefault("toolsets", ["all"])
 
     model["base_url"] = proxy_url
     cfg["model"] = model
 
     try:
+        HERMES_DIR.mkdir(parents=True, exist_ok=True)
         with open(HERMES_CONFIG_PATH, "w") as fh:
-            yaml.dump(cfg, fh, default_flow_style=False, sort_keys=False,
-                      allow_unicode=True)
-        return True
+            yaml.dump(cfg, fh, default_flow_style=False, sort_keys=False, allow_unicode=True)
+        status = "created" if created else ("unchanged" if original_url == proxy_url else "patched")
+        return {"ok": True, "status": status, "path": str(HERMES_CONFIG_PATH)}
     except Exception:
-        return False
+        return {"ok": False, "status": "error", "path": str(HERMES_CONFIG_PATH)}
+
+
+def patch_hermes_config(proxy_url: str = "http://127.0.0.1:8347/v1") -> bool:
+    """Backward-compatible bool wrapper around :func:`ensure_hermes_config`."""
+    return bool(ensure_hermes_config(proxy_url).get("ok"))
 
 
 def restore_hermes_config() -> bool:

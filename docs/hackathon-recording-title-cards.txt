@@ -1,0 +1,14 @@
+OPENING
+RuleShield
+Cut repetitive LLM spend. Validate safely in shadow mode.
+
+MID MONITOR OVERLAY
+What the user sees vs. what RuleShield sees
+
+CLOSING
+Optimize safely. Spend less. Learn over time.
+RuleShield
+
+END FRAME
+RuleShield
+github.com/banse/RuleShield

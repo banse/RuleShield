@@ -31,7 +31,7 @@
 					Back to Cron Lab
 				</a>
 				<div class="rounded-lg border border-border bg-surface px-3 py-2 text-xs text-text-secondary">
-					{data.connected ? 'Live on :8337' : 'Disconnected'}
+					{data.connected ? 'Live Gateway' : 'Disconnected'}
 				</div>
 			</div>
 		</div>

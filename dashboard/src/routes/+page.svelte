@@ -149,7 +149,7 @@
 					class:animate-pulse={connected}
 				></div>
 				<span class="font-mono text-xs text-text-secondary">
-					{connected ? '127.0.0.1:8337' : 'offline'}
+					{connected ? 'gateway online' : 'offline'}
 				</span>
 			</div>
 		</div>

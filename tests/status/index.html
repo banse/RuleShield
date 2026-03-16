@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Status</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <h1>Test Status</h1>
+        <p>Standalone suite status page (independent from app monitor).</p>
+      </header>
+
+      <section class="meta">
+        <div id="generatedAt">Summary generated: -</div>
+        <div id="gatewayStatus">Gateway status: -</div>
+        <div id="gatewayPort">Gateway port: -</div>
+      </section>
+
+      <section class="tabs">
+        <button id="tabTests" class="tab active" type="button">Tests</button>
+        <button id="tabLogs" class="tab" type="button">Story Logs</button>
+      </section>
+
+      <section id="panelTests" class="panel active">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Test</th>
+                <th>Path</th>
+                <th>Group</th>
+                <th>Last Run</th>
+                <th>Status</th>
+                <th>Error (last failed run)</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="panelLogs" class="panel">
+        <div id="logFeed" class="log-feed"></div>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

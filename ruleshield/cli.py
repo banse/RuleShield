@@ -68,7 +68,7 @@ def init(hermes: bool) -> None:
     """Initialize RuleShield configuration and rules."""
     from ruleshield.config import (
         RULESHIELD_DIR as CFG_DIR,
-        patch_hermes_config,
+        ensure_hermes_config,
         write_default_config,
     )
 
@@ -106,16 +106,24 @@ def init(hermes: bool) -> None:
     # Step 4: Hermes integration
     if hermes:
         console.print(f"  [bold]4.[/bold] Configuring Hermes Agent integration...", end=" ")
-        success = patch_hermes_config()
-        if success:
+        result = ensure_hermes_config()
+        if result.get("ok"):
             console.print("[bright_green]done[/bright_green]")
+            status = result.get("status", "patched")
+            config_label = {
+                "created": "created starter config",
+                "patched": "patched existing config",
+                "unchanged": "config already pointed at RuleShield",
+            }.get(status, status)
+            console.print(f"     [dim]{config_label}: [cyan]{result.get('path')}[/cyan][/dim]")
+            if status == "created":
+                console.print(
+                    "     [dim]Starter profile defaults to [cyan]openai-codex[/cyan] with "
+                    "[cyan]gpt-5.1-codex-mini[/cyan]. Change provider/model later if needed.[/dim]"
+                )
         else:
-            console.print("[yellow]skipped (Hermes config not found at ~/.hermes/cli-config.yaml)[/yellow]")
-            console.print()
-            console.print(
-                "     [dim]To configure manually, set [cyan]api_base: http://127.0.0.1:8337[/cyan]"
-                " in your Hermes config.[/dim]"
-            )
+            console.print("[red]failed[/red]")
+            console.print("     [dim]Could not write [cyan]~/.hermes/config.yaml[/cyan].[/dim]")
     else:
         console.print(f"  [bold]4.[/bold] Hermes integration [dim]skipped (use --hermes to enable)[/dim]")
 
@@ -144,16 +152,29 @@ def init(hermes: bool) -> None:
     qs_table.add_column("Description", style=_DIM)
 
     qs_table.add_row("1.", "ruleshield start", "Start the proxy server")
-    qs_table.add_row("2.", "export RULESHIELD_API_KEY=sk-...", "Set your API key")
+    qs_table.add_row("2.", "hermes", "Run Hermes through the patched local config")
     qs_table.add_row("3.", "ruleshield stats", "View cost savings")
-    qs_table.add_row("4.", "ruleshield rules", "List active rules")
+    qs_table.add_row("4.", "ruleshield restore-hermes", "Restore original Hermes base_url")
 
     console.print(qs_table)
     console.print()
     console.print(f"  Config:  [cyan]{config_path}[/cyan]")
     console.print(f"  Rules:   [cyan]{RULES_DIR}[/cyan]")
-    console.print(f"  Proxy:   [cyan]http://localhost:8337[/cyan]")
+    console.print(f"  Proxy:   [cyan]http://localhost:8347[/cyan]")
+    console.print("  [dim]Auth:   Hermes still needs your local login/API key setup (for example ~/.codex/auth.json or ~/.hermes/.env).[/dim]")
     console.print()
+
+
+@main.command(name="restore-hermes")
+def restore_hermes() -> None:
+    """Restore the original Hermes base_url if RuleShield changed it."""
+    from ruleshield.config import restore_hermes_config
+
+    if restore_hermes_config():
+        console.print("[bright_green]Restored Hermes base_url from backup.[/bright_green]")
+    else:
+        console.print("[yellow]No Hermes base_url backup found or restore failed.[/yellow]")
+        console.print("[dim]Expected backup: ~/.ruleshield/hermes_original_url.txt[/dim]")
 
 
 # ---------------------------------------------------------------------------
@@ -176,6 +197,8 @@ def start(port: int | None, daemon: bool) -> None:
     print_startup_banner()
 
     console.print(f"  Proxy running on [bold cyan]http://localhost:{settings.port}[/bold cyan]")
+    console.print(f"  Main page:      [bold cyan]http://127.0.0.1:5174/[/bold cyan]")
+    console.print(f"  Training monitor: [bold cyan]http://127.0.0.1:5174/test-monitor[/bold cyan]")
     console.print(f"  Forwarding to    [dim]{settings.provider_url}[/dim]")
     console.print(f"  Cache: [{'bright_green' if settings.cache_enabled else 'red'}]"
                   f"{'enabled' if settings.cache_enabled else 'disabled'}[/]  "
@@ -589,8 +612,7 @@ def shadow_reset(rule_id: str | None, yes: bool) -> None:
 )
 @click.option(
     "--proxy-url",
-    default="http://127.0.0.1:8337",
-    show_default=True,
+    default=None,
     help="RuleShield proxy base URL used for traffic observation and reporting.",
 )
 @click.option(
@@ -606,11 +628,16 @@ def run_prompt_training_cmd(
     scenario_config: Path | None,
     max_prompts: int | None,
     output_dir: Path,
-    proxy_url: str,
+    proxy_url: str | None,
     max_iterations: int,
 ) -> None:
     """Run a short Hermes-driven RuleShield training scenario."""
+    from ruleshield.config import load_settings
     from ruleshield.prompt_training import run_prompt_training
+
+    if not proxy_url:
+        settings = load_settings()
+        proxy_url = f"http://127.0.0.1:{settings.port}"
 
     console.print()
     console.print(

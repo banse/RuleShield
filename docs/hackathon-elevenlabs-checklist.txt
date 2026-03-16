@@ -1,0 +1,10 @@
+Hackathon ElevenLabs Checklist
+
+[ ] ElevenLabs offen
+[ ] Free Plan probiert
+[ ] natuerliche maennliche Stimme gewaehlt
+[ ] Option 1 getestet
+[ ] 4 Voiceover-Bloecke einzeln gerendert
+[ ] Audio kurz angehoert
+[ ] nur problematische Bloecke neu gerendert
+[ ] Dateien fuer den Schnitt exportiert

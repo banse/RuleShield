@@ -1,6 +1,7 @@
 import type { PageServerLoad } from './$types';
+import { getGatewayBaseServer } from '$lib/gateway';
 
-const API_BASE = 'http://127.0.0.1:8337';
+const API_BASE = getGatewayBaseServer();
 const RECENT_COMPARISONS = 25;
 const REQUEST_LIMIT = 30;
 

@@ -78,7 +78,7 @@
 				</a>
 				<div class="rounded-lg border border-border bg-surface px-3 py-2 text-xs text-text-secondary">
 					<span class:animate-pulse={connected && refreshing} class="mr-2 inline-block h-2 w-2 rounded-full bg-accent"></span>
-					{connected ? `Live on :8337` : 'Disconnected'}
+					{connected ? 'Live Gateway' : 'Disconnected'}
 				</div>
 			</div>
 		</header>

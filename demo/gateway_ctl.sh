@@ -2,9 +2,10 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PYTHON_BIN="${PYTHON_BIN:-$ROOT_DIR/.venv/bin/python}"
+source "$ROOT_DIR/demo/_helpers.sh"
+PYTHON_BIN="${PYTHON_BIN:-$(ruleshield_python_bin)}"
 HOST="${HOST:-127.0.0.1}"
-PORT="${PORT:-8337}"
+PORT="${PORT:-$(ruleshield_config_port 2>/dev/null || printf '8347')}"
 LOG_FILE="${LOG_FILE:-/tmp/ruleshield-gateway.log}"
 PID_FILE="${PID_FILE:-/tmp/ruleshield-gateway.pid}"
 
@@ -59,7 +60,7 @@ kill_all_ruleshield_gateways() {
   kill_matching_processes "ruleshield start"
   kill_matching_processes "python -m uvicorn ruleshield.proxy:app"
   # Also clear common default/listening ports if lingering.
-  for p in 8337 8338 8339; do
+  for p in 8337 8338 8339 8347 8348 8349; do
     PORT="$p" kill_by_port
   done
 }
@@ -94,7 +95,10 @@ start_gateway() {
     fi
     sleep 0.2
   done
+  local pid
+  pid="$(cat "$PID_FILE" 2>/dev/null || true)"
   echo "Gateway running on http://${HOST}:${PORT}"
+  echo "Gateway startup complete. pid=${pid:-unknown} log=${LOG_FILE}"
 }
 
 stop_gateway() {

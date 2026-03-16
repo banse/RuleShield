@@ -1,0 +1,14 @@
+{
+  "name": "ruleshield-hermes-local",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "setup": "bash ./scripts/install.sh",
+    "setup:hermes": "bash ./scripts/install.sh --hermes",
+    "init": "./.venv/bin/ruleshield init",
+    "init:hermes": "./.venv/bin/ruleshield init --hermes",
+    "start": "./.venv/bin/ruleshield start",
+    "stop": "./.venv/bin/ruleshield stop",
+    "stats": "./.venv/bin/ruleshield stats"
+  }
+}

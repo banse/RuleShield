@@ -24,12 +24,12 @@
 	<li>Creates <code class="docs-code">~/.ruleshield/</code> directory</li>
 	<li>Writes default <code class="docs-code">config.yaml</code></li>
 	<li>Installs 8 default rules for common Hermes patterns</li>
-	<li>Patches <code class="docs-code">~/.hermes/config.yaml</code> to point <code class="docs-code">model.base_url</code> at the proxy</li>
+	<li>Patches <code class="docs-code">~/.hermes/config.yaml</code> to point <code class="docs-code">model.base_url</code> at the proxy, or creates a minimal starter config if none exists</li>
 </ol>
 
 <div class="docs-note">
 	<strong>Non-destructive.</strong> RuleShield saves your original Hermes <code class="docs-code">base_url</code>
-	before patching. Run <code class="docs-code">ruleshield stop</code> to restore it.
+	before patching when one already exists. Use <code class="docs-code">ruleshield restore-hermes</code> to restore it later.
 </div>
 
 <!-- How Config Patching Works -->
@@ -38,7 +38,8 @@
 <p class="docs-p">
 	When you run <code class="docs-code">ruleshield init --hermes</code>, RuleShield reads your
 	Hermes config at <code class="docs-code">~/.hermes/config.yaml</code> and updates the
-	<code class="docs-code">model.base_url</code> field to point to the proxy.
+	<code class="docs-code">model.base_url</code> field to point to the proxy. If the file does not
+	exist yet, RuleShield creates a minimal starter config for a normal local Hermes setup.
 </p>
 
 <h3 class="docs-h3">Before</h3>
@@ -51,7 +52,7 @@ model:
 <h3 class="docs-h3">After</h3>
 <pre class="docs-pre"><span class="comment"># ~/.hermes/config.yaml (patched by RuleShield)</span>
 model:
-  base_url: <span class="string">http://127.0.0.1:8337/v1</span>
+  base_url: <span class="string">http://127.0.0.1:8347/v1</span>
   model_name: gpt-4o
   api_key: sk-...</pre>
 
@@ -60,13 +61,45 @@ model:
 	<code class="docs-code">~/.ruleshield/hermes_original_url.txt</code> so it can be restored later.
 </p>
 
+<h3 class="docs-h3">Blank Start</h3>
+<p class="docs-p">
+	If you are starting from a fresh Hermes install with no existing config, RuleShield creates a
+	minimal starter config with a local proxy <code class="docs-code">base_url</code> and default
+	Codex-style model settings. You can change provider or model later in Hermes as needed.
+</p>
+
+<h3 class="docs-h3">Restore</h3>
+<pre class="docs-pre">ruleshield restore-hermes</pre>
+
+<h2 class="docs-h2">Auth Expectations</h2>
+
+<p class="docs-p">
+	RuleShield does not store provider secrets in the repository. A normal local Hermes setup should keep
+	auth in your local Hermes or Codex home, for example:
+</p>
+
+<ul class="docs-p list-disc list-inside space-y-2">
+	<li><code class="docs-code">~/.codex/auth.json</code> for OpenAI OAuth / Codex-style local auth</li>
+	<li><code class="docs-code">~/.hermes/.env</code> for local provider API keys such as OpenRouter</li>
+	<li>environment variables in your local shell if you prefer that flow</li>
+</ul>
+
+<h2 class="docs-h2">Verify It Works</h2>
+
+<ol class="docs-p list-decimal list-inside space-y-2">
+	<li>Run <code class="docs-code">ruleshield start</code></li>
+	<li>Start Hermes normally</li>
+	<li>Send a simple prompt like <code class="docs-code">hello</code></li>
+	<li>Confirm RuleShield saw traffic via <code class="docs-code">ruleshield stats</code> or the dashboard</li>
+</ol>
+
 <h3 class="docs-h3">Manual Configuration</h3>
 <p class="docs-p">
 	If your Hermes config is not at the default path, set the <code class="docs-code">base_url</code>
 	manually:
 </p>
 <pre class="docs-pre"><span class="comment"># Point any OpenAI-compatible client at the proxy</span>
-base_url: <span class="string">http://127.0.0.1:8337/v1</span></pre>
+base_url: <span class="string">http://127.0.0.1:&lt;PORT&gt;/v1</span></pre>
 
 <!-- Hermes Skill -->
 <h2 class="docs-h2">Hermes Skill</h2>

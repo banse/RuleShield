@@ -35,10 +35,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/banse/ruleshield-hermes"
-Documentation = "https://github.com/banse/ruleshield-hermes#readme"
-Repository = "https://github.com/banse/ruleshield-hermes"
-"Issue Tracker" = "https://github.com/banse/ruleshield-hermes/issues"
+Homepage = "https://github.com/banse/RuleShield"
+Documentation = "https://github.com/banse/RuleShield#readme"
+Repository = "https://github.com/banse/RuleShield"
+"Issue Tracker" = "https://github.com/banse/RuleShield/issues"
 
 [project.optional-dependencies]
 dev = ["pytest", "pytest-asyncio", "ruff"]

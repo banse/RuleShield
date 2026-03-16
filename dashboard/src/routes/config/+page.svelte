@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { getGatewayBaseClient } from '$lib/gateway';
 
-	const API_BASE = 'http://127.0.0.1:8337';
+	let apiBase = $state('');
 
 	type RuntimeConfig = {
 		rules_enabled: boolean;
@@ -34,7 +35,7 @@
 
 	async function getJSON(path: string, fallback: any) {
 		try {
-			const res = await fetch(`${API_BASE}${path}`);
+			const res = await fetch(`${apiBase}${path}`);
 			if (!res.ok) return fallback;
 			return await res.json();
 		} catch {
@@ -43,7 +44,7 @@
 	}
 
 	async function postJSON(path: string, body: Record<string, unknown>) {
-		const res = await fetch(`${API_BASE}${path}`, {
+		const res = await fetch(`${apiBase}${path}`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(body)
@@ -98,6 +99,7 @@
 	onMount(() => {
 		let alive = true;
 		(async () => {
+			apiBase = getGatewayBaseClient();
 			await loadData();
 			if (alive) loading = false;
 		})();

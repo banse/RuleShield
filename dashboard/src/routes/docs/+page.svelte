@@ -39,7 +39,8 @@ ruleshield init <span class="flag">--hermes</span></pre>
 ruleshield start</pre>
 
 <p class="docs-p">
-	Point your Hermes Agent at <code class="docs-code">http://127.0.0.1:8337</code>.
+	Point your Hermes Agent at <code class="docs-code">http://127.0.0.1:&lt;PORT&gt;</code>
+	(or your configured gateway URL).
 	Costs drop immediately. No code changes needed.
 </p>
 
@@ -92,7 +93,7 @@ ruleshield start</pre>
 <pre class="docs-pre">pip install ruleshield-hermes</pre>
 
 <h3 class="docs-h3">Install from source</h3>
-<pre class="docs-pre">git clone https://github.com/ruleshield/ruleshield-hermes.git
+<pre class="docs-pre">git clone https://github.com/banse/RuleShield.git
 <span class="keyword">cd</span> ruleshield-hermes
 pip install <span class="flag">-e</span> .</pre>
 
@@ -197,7 +198,7 @@ api_key: <span class="string">sk-your-key-here</span></pre>
 		</div>
 	</a>
 
-	<a href="https://github.com/banse/ruleshield-hermes/blob/main/docs/rules-engine.md" class="docs-card block no-underline" target="_blank" rel="noopener noreferrer">
+	<a href="https://github.com/banse/RuleShield/blob/main/docs/rules-engine.md" class="docs-card block no-underline" target="_blank" rel="noopener noreferrer">
 		<div class="flex items-start gap-3">
 			<div class="text-primary text-xl mt-0.5">
 				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -212,7 +213,7 @@ api_key: <span class="string">sk-your-key-here</span></pre>
 		</div>
 	</a>
 
-	<a href="https://github.com/banse/ruleshield-hermes/blob/main/docs/rules-engine-operations.md" class="docs-card block no-underline" target="_blank" rel="noopener noreferrer">
+	<a href="https://github.com/banse/RuleShield/blob/main/docs/rules-engine-operations.md" class="docs-card block no-underline" target="_blank" rel="noopener noreferrer">
 		<div class="flex items-start gap-3">
 			<div class="text-primary text-xl mt-0.5">
 				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -227,7 +228,7 @@ api_key: <span class="string">sk-your-key-here</span></pre>
 		</div>
 	</a>
 
-	<a href="https://github.com/banse/ruleshield-hermes/blob/main/docs/cron-optimization-spec.md" class="docs-card block no-underline" target="_blank" rel="noopener noreferrer">
+	<a href="https://github.com/banse/RuleShield/blob/main/docs/cron-optimization-spec.md" class="docs-card block no-underline" target="_blank" rel="noopener noreferrer">
 		<div class="flex items-start gap-3">
 			<div class="text-primary text-xl mt-0.5">
 				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -242,7 +243,7 @@ api_key: <span class="string">sk-your-key-here</span></pre>
 		</div>
 	</a>
 
-	<a href="https://github.com/banse/ruleshield-hermes/blob/main/docs/cron-optimizer-quickstart.md" class="docs-card block no-underline" target="_blank" rel="noopener noreferrer">
+	<a href="https://github.com/banse/RuleShield/blob/main/docs/cron-optimizer-quickstart.md" class="docs-card block no-underline" target="_blank" rel="noopener noreferrer">
 		<div class="flex items-start gap-3">
 			<div class="text-primary text-xl mt-0.5">
 				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -257,7 +258,7 @@ api_key: <span class="string">sk-your-key-here</span></pre>
 		</div>
 	</a>
 
-	<a href="https://github.com/banse/ruleshield-hermes/blob/main/docs/cron-optimizer-user-guide.md" class="docs-card block no-underline" target="_blank" rel="noopener noreferrer">
+	<a href="https://github.com/banse/RuleShield/blob/main/docs/cron-optimizer-user-guide.md" class="docs-card block no-underline" target="_blank" rel="noopener noreferrer">
 		<div class="flex items-start gap-3">
 			<div class="text-primary text-xl mt-0.5">
 				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -272,7 +273,7 @@ api_key: <span class="string">sk-your-key-here</span></pre>
 		</div>
 	</a>
 
-	<a href="https://github.com/banse/ruleshield-hermes/blob/main/docs/cron-optimization-implementation-plan.md" class="docs-card block no-underline" target="_blank" rel="noopener noreferrer">
+	<a href="https://github.com/banse/RuleShield/blob/main/docs/cron-optimization-implementation-plan.md" class="docs-card block no-underline" target="_blank" rel="noopener noreferrer">
 		<div class="flex items-start gap-3">
 			<div class="text-primary text-xl mt-0.5">
 				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -287,7 +288,7 @@ api_key: <span class="string">sk-your-key-here</span></pre>
 		</div>
 	</a>
 
-	<a href="https://github.com/banse/ruleshield-hermes/blob/main/docs/cron-runtime-guide.md" class="docs-card block no-underline" target="_blank" rel="noopener noreferrer">
+	<a href="https://github.com/banse/RuleShield/blob/main/docs/cron-runtime-guide.md" class="docs-card block no-underline" target="_blank" rel="noopener noreferrer">
 		<div class="flex items-start gap-3">
 			<div class="text-primary text-xl mt-0.5">
 				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,0 +1,214 @@
+:root {
+  color-scheme: dark;
+  --bg: #0b1020;
+  --panel: #111936;
+  --line: #2a3566;
+  --text: #e7ecff;
+  --muted: #9eabdf;
+  --ok: #24d190;
+  --fail: #ff6b6b;
+  --unknown: #8b95c9;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(1200px 700px at 10% 0%, #173266 0%, var(--bg) 60%);
+  color: var(--text);
+  font-family: "SF Pro Display", "Segoe UI", Arial, sans-serif;
+}
+
+.page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 28px 20px 40px;
+}
+
+.hero h1 {
+  margin: 0 0 8px;
+  font-size: 38px;
+  letter-spacing: 0.02em;
+}
+
+.hero p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.meta {
+  margin: 18px 0;
+  color: var(--muted);
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin: 0 0 14px;
+}
+
+.tab {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  padding: 8px 14px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+}
+
+.tab.active {
+  color: var(--text);
+  border-color: #4f65bb;
+  background: rgba(79, 101, 187, 0.22);
+}
+
+.panel {
+  display: none;
+}
+
+.panel.active {
+  display: block;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 980px;
+}
+
+th, td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 12px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+td {
+  font-size: 14px;
+}
+
+.status {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.status-success {
+  background: rgba(36, 209, 144, 0.15);
+  color: var(--ok);
+}
+
+.status-failed {
+  background: rgba(255, 107, 107, 0.16);
+  color: var(--fail);
+}
+
+.status-never {
+  background: rgba(139, 149, 201, 0.18);
+  color: var(--unknown);
+}
+
+.path {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: #c7d2ff;
+}
+
+.error {
+  color: #ffd3d3;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  max-width: 420px;
+  white-space: pre-wrap;
+}
+
+.error-link {
+  color: #ffd3d3;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.error-link:hover {
+  color: #ffb9b9;
+}
+
+.log-feed {
+  display: grid;
+  gap: 12px;
+}
+
+.log-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 12px;
+}
+
+.log-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-bottom: 8px;
+}
+
+.log-title {
+  font-weight: 600;
+}
+
+.log-meta {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.log-path {
+  color: #9fb0ff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.log-link {
+  color: #9fb0ff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.log-link:hover {
+  color: #c7d4ff;
+}
+
+.log-body {
+  margin: 0;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.22);
+  color: #d7e1ff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  white-space: pre-wrap;
+}

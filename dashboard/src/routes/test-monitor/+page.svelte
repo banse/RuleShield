@@ -1,7 +1,12 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
+	import {
+		DEFAULT_GATEWAY_BASE,
+		GATEWAY_BASE_STORAGE_KEY,
+		getGatewayBaseClient
+	} from '$lib/gateway';
 
-	const API_BASE = 'http://127.0.0.1:8337';
+	let apiBase = $state(DEFAULT_GATEWAY_BASE);
 
 	type ScriptEntry = {
 		path: string;
@@ -29,6 +34,7 @@
 		script_path: string;
 		command: string[];
 		status: string;
+		model_profile_id?: string;
 		started_at: number;
 		ended_at: number | null;
 		return_code: number | null;
@@ -75,6 +81,7 @@
 	let selectedRunId = $state<string>('');
 	let selectedRunEvents = $state<RunEvent[]>([]);
 	let selectedRunStatus = $state('');
+	let selectedRunPinnedUntil = $state(0);
 	let logPanel: HTMLDivElement | null = $state(null);
 	let lastLogFingerprint = $state('');
 	let shadowEnabled = $state(false);
@@ -86,6 +93,7 @@
 	let selectedRunRuleShield = $state<RunRuleShieldStats | null>(null);
 	let modelProfiles = $state<ModelProfile[]>([]);
 	let selectedModelProfileId = $state('');
+	let lastSelectedModelProfileId = $state('');
 	const PROFILE_STORAGE_KEY = 'ruleshield_test_monitor_profile_id';
 	const ALL_PROFILES_ID = '__all__';
 
@@ -115,6 +123,11 @@
 		return 2;
 	}
 
+	function scriptHasKnownProfileSuffix(script: ScriptEntry, profiles: ModelProfile[]): boolean {
+		const lowerPath = script.path.toLowerCase();
+		return profiles.some((profile) => lowerPath.endsWith(`.${profile.script_suffix.toLowerCase()}.sh`));
+	}
+
 	function applyProfileFilter(allScripts: ScriptEntry[], profiles: ModelProfile[], profileId: string): ScriptEntry[] {
 		if (!profileId || profileId === ALL_PROFILES_ID) return allScripts;
 		const selected = profiles.find((p) => p.id === profileId);
@@ -122,17 +135,80 @@
 
 		const selectedSuffix = `.${selected.script_suffix.toLowerCase()}.sh`;
 		const filtered = allScripts.filter((script) => script.path.toLowerCase().endsWith(selectedSuffix));
+		const fallbackGenericScripts = allScripts.filter((script) => !scriptHasKnownProfileSuffix(script, profiles));
+		const scriptsForProfile = filtered.length > 0 ? filtered : fallbackGenericScripts;
 
-		return filtered.sort((a, b) => {
+		return scriptsForProfile.sort((a, b) => {
 			const prio = scriptPriority(a) - scriptPriority(b);
 			if (prio !== 0) return prio;
 			return a.name.localeCompare(b.name);
 		});
 	}
 
+	function effectiveProfileIdForScript(script: ScriptEntry): string {
+		if (selectedModelProfileId && selectedModelProfileId !== ALL_PROFILES_ID) {
+			return selectedModelProfileId;
+		}
+		return script.default_model_profile_id ?? modelProfiles[0]?.id ?? '';
+	}
+
+	function relevantRunsForSelection(allRuns: RunEntry[], filteredScripts: ScriptEntry[], profileId: string): RunEntry[] {
+		const visiblePaths = new Set(filteredScripts.map((script) => script.path));
+		return allRuns.filter((run) => {
+			if (!visiblePaths.has(run.script_path)) return false;
+			if (!profileId || profileId === ALL_PROFILES_ID) return true;
+			return run.model_profile_id === profileId;
+		});
+	}
+
+	function sameScriptList(left: ScriptEntry[], right: ScriptEntry[]): boolean {
+		if (left.length !== right.length) return false;
+		return left.every((entry, index) => entry.path === right[index]?.path);
+	}
+
+	function resetRuleShieldLive() {
+		selectedRunRuleShield = null;
+		shadowEnabled = false;
+		shadowComparisons = 0;
+		activeRules = 0;
+		confidenceUp = 0;
+		confidenceDown = 0;
+		latestRuleEvents = [];
+	}
+
+	function normalizeApiBase(input: string): string {
+		return input.trim().replace(/\/+$/, '');
+	}
+
+	async function isReachableApiBase(base: string): Promise<boolean> {
+		try {
+			const res = await fetch(`${base}/health`);
+			return res.ok;
+		} catch {
+			return false;
+		}
+	}
+
+	async function resolveApiBase(): Promise<string> {
+		const candidates = [getGatewayBaseClient(), DEFAULT_GATEWAY_BASE]
+			.filter((value): value is string => Boolean(value))
+			.map(normalizeApiBase);
+
+		for (const candidate of candidates) {
+			if (await isReachableApiBase(candidate)) {
+				if (typeof localStorage !== 'undefined') {
+					localStorage.setItem(GATEWAY_BASE_STORAGE_KEY, candidate);
+				}
+				return candidate;
+			}
+		}
+
+		return DEFAULT_GATEWAY_BASE;
+	}
+
 	async function getJSON(path: string, fallback: any) {
 		try {
-			const res = await fetch(`${API_BASE}${path}`);
+			const res = await fetch(`${apiBase}${path}`);
 			if (!res.ok) return fallback;
 			return await res.json();
 		} catch {
@@ -141,7 +217,7 @@
 	}
 
 	async function postJSON(path: string, body: Record<string, string>) {
-		const res = await fetch(`${API_BASE}${path}`, {
+		const res = await fetch(`${apiBase}${path}`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(body)
@@ -176,23 +252,37 @@
 				modelProfiles[0]?.id ??
 				'';
 		}
-		if (selectedModelProfileId && !modelProfiles.some((p) => p.id === selectedModelProfileId)) {
+		if (
+			selectedModelProfileId &&
+			selectedModelProfileId !== ALL_PROFILES_ID &&
+			!modelProfiles.some((p) => p.id === selectedModelProfileId)
+		) {
 			selectedModelProfileId =
 				profileData.default_profile_id ?? scripts[0]?.default_model_profile_id ?? modelProfiles[0]?.id ?? '';
 		}
-		visibleScripts = applyProfileFilter(scripts, modelProfiles, selectedModelProfileId);
 
-		if (selectedRunId && !runs.some((run) => run.run_id === selectedRunId)) {
+		if (lastSelectedModelProfileId && selectedModelProfileId !== lastSelectedModelProfileId) {
 			selectedRunId = '';
 			selectedRunEvents = [];
 			selectedRunStatus = '';
+			resetRuleShieldLive();
 		}
+		lastSelectedModelProfileId = selectedModelProfileId;
 
-		if (!selectedRunId) {
-			selectedRunId = runs[0]?.run_id ?? '';
+		visibleScripts = applyProfileFilter(scripts, modelProfiles, selectedModelProfileId);
+		const relevantRuns = relevantRunsForSelection(runs, visibleScripts, selectedModelProfileId);
+
+		const selectedRunVisible = relevantRuns.some((run) => run.run_id === selectedRunId);
+		const keepPinnedSelection = Date.now() < selectedRunPinnedUntil;
+		if (selectedRunId && !selectedRunVisible && !keepPinnedSelection) {
+			selectedRunId = '';
+			selectedRunEvents = [];
+			selectedRunStatus = '';
+			resetRuleShieldLive();
 		}
 
 		if (selectedRunId) {
+			resetRuleShieldLive();
 			const [eventsData, runRuleShieldData] = await Promise.all([
 				getJSON(`/api/test-monitor/runs/${selectedRunId}/events?limit=700`, {
 					events: [],
@@ -223,24 +313,12 @@
 				confidenceDown = selectedRunRuleShield.confidence_down;
 				latestRuleEvents = selectedRunRuleShield.recent_rule_events;
 			} else {
-				selectedRunRuleShield = null;
-				shadowEnabled = false;
-				shadowComparisons = 0;
-				activeRules = 0;
-				confidenceUp = 0;
-				confidenceDown = 0;
-				latestRuleEvents = [];
+				resetRuleShieldLive();
 			}
 		} else {
 			selectedRunEvents = [];
 			selectedRunStatus = '';
-			selectedRunRuleShield = null;
-			shadowEnabled = false;
-			shadowComparisons = 0;
-			activeRules = 0;
-			confidenceUp = 0;
-			confidenceDown = 0;
-			latestRuleEvents = [];
+			resetRuleShieldLive();
 		}
 	}
 
@@ -250,9 +328,50 @@
 		try {
 			const response = await postJSON('/api/test-monitor/start', {
 				script_path: scriptPath,
-				model_profile_id: selectedModelProfileId
+				model_profile_id: effectiveProfileIdForScript(scripts.find((script) => script.path === scriptPath) ?? {
+					path: scriptPath,
+					name: '',
+					type: 'shell',
+					status: 'not_started',
+					active_run_id: null,
+					last_run_id: null,
+					last_return_code: null
+				})
 			});
 			selectedRunId = response.run_id;
+			selectedRunPinnedUntil = Date.now() + 15000;
+			selectedRunStatus = 'active';
+			resetRuleShieldLive();
+			const [eventsData, runRuleShieldData] = await Promise.all([
+				getJSON(`/api/test-monitor/runs/${response.run_id}/events?limit=700`, {
+					events: [],
+					status: 'active'
+				}),
+				getJSON(`/api/test-monitor/runs/${response.run_id}/ruleshield`, {})
+			]);
+			selectedRunEvents = eventsData.events ?? [];
+			selectedRunStatus = eventsData.status ?? 'active';
+			if (runRuleShieldData?.available) {
+				selectedRunRuleShield = {
+					available: true,
+					triggered_rules: Number(runRuleShieldData.triggered_rules ?? 0),
+					would_trigger_shadow: Number(runRuleShieldData.would_trigger_shadow ?? 0),
+					cost_without: Number(runRuleShieldData.cost_without ?? 0),
+					cost_with: Number(runRuleShieldData.cost_with ?? 0),
+					savings_usd: Number(runRuleShieldData.savings_usd ?? 0),
+					savings_pct: Number(runRuleShieldData.savings_pct ?? 0),
+					shadow_enabled: Boolean(runRuleShieldData.shadow_enabled),
+					confidence_up: Number(runRuleShieldData.confidence_up ?? 0),
+					confidence_down: Number(runRuleShieldData.confidence_down ?? 0),
+					recent_rule_events: (runRuleShieldData.recent_rule_events ?? []).slice(0, 8)
+				};
+				shadowEnabled = selectedRunRuleShield.shadow_enabled;
+				shadowComparisons = selectedRunRuleShield.would_trigger_shadow;
+				activeRules = selectedRunRuleShield.triggered_rules;
+				confidenceUp = selectedRunRuleShield.confidence_up;
+				confidenceDown = selectedRunRuleShield.confidence_down;
+				latestRuleEvents = selectedRunRuleShield.recent_rule_events;
+			}
 			await loadData();
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Start failed';
@@ -277,6 +396,7 @@
 	onMount(() => {
 		let alive = true;
 		(async () => {
+			apiBase = await resolveApiBase();
 			await loadData();
 			if (alive) loading = false;
 		})();
@@ -295,7 +415,19 @@
 		if (selectedModelProfileId && typeof localStorage !== 'undefined') {
 			localStorage.setItem(PROFILE_STORAGE_KEY, selectedModelProfileId);
 		}
-		visibleScripts = applyProfileFilter(scripts, modelProfiles, selectedModelProfileId);
+		const nextVisibleScripts = applyProfileFilter(scripts, modelProfiles, selectedModelProfileId);
+		if (!sameScriptList(visibleScripts, nextVisibleScripts)) {
+			visibleScripts = nextVisibleScripts;
+		}
+		const relevantRuns = relevantRunsForSelection(runs, nextVisibleScripts, selectedModelProfileId);
+		const nextSelectedRunId =
+			selectedRunId &&
+			(relevantRuns.some((run) => run.run_id === selectedRunId) || Date.now() < selectedRunPinnedUntil)
+				? selectedRunId
+				: '';
+		if (nextSelectedRunId !== selectedRunId) {
+			selectedRunId = nextSelectedRunId;
+		}
 	});
 
 	$effect(() => {
@@ -317,14 +449,14 @@
 	<title>Test Monitor</title>
 </svelte:head>
 
-<div class="h-screen overflow-hidden bg-[#0B0D12] px-6 py-6 text-text-primary">
-	<div class="mx-auto flex h-full max-w-7xl flex-col overflow-hidden">
+<div class="h-screen overflow-auto bg-[#0B0D12] px-6 py-6 text-text-primary">
+	<div class="mx-auto flex max-w-7xl flex-col">
 		<header class="mb-4 flex items-end justify-between border-b border-border pb-4">
 			<div>
-				<p class="text-xs uppercase tracking-[0.18em] text-text-muted">Minimal Monitoring</p>
-				<h1 class="text-2xl font-bold">Test Monitor</h1>
+				<p class="text-xs uppercase tracking-[0.18em] text-text-muted">Ruleshield Monitoring</p>
+				<h1 class="text-2xl font-bold">Rule Training</h1>
 				<p class="mt-1 text-sm text-text-secondary">
-					Scripts starten/stoppen und Prompt/Antwort-Logs live beobachten.
+					Start and stop scripts while monitoring prompt and response logs live.
 				</p>
 			</div>
 			<a
@@ -339,8 +471,8 @@
 			<div class="mb-3 rounded-lg border border-error/30 bg-error/10 px-3 py-2 text-sm text-error">{error}</div>
 		{/if}
 
-		<div class="grid min-h-0 min-w-0 flex-1 gap-5 lg:grid-cols-[1fr_2fr]">
-			<section class="flex min-h-0 min-w-0 flex-col rounded-xl border border-border bg-surface p-4">
+		<div class="grid min-w-0 gap-5 md:grid-cols-3 md:items-start">
+			<section class="flex min-h-0 min-w-0 flex-col rounded-xl border border-border bg-surface p-4 md:col-span-1 md:max-h-[calc(100vh-10rem)]">
 				<h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-text-muted">Test Scripts</h2>
 				<div class="mb-3 rounded-md border border-border bg-surface-elevated/40 px-3 py-2 text-xs">
 					<label class="mb-1 block text-[11px] uppercase tracking-wider text-text-muted" for="model-profile">
@@ -364,7 +496,7 @@
 						Vorbereitung für profil-spezifische Testfiles aktiv (Fallback auf aktuelle Files).
 					</p>
 				</div>
-				<div class="min-h-0 flex-1 overflow-auto pr-1">
+				<div class="max-h-[42rem] overflow-auto pr-1 md:max-h-[calc(100vh-20rem)]">
 					{#if loading}
 						<p class="text-sm text-text-muted">Loading…</p>
 					{:else if visibleScripts.length === 0}
@@ -408,8 +540,8 @@
 				</div>
 			</section>
 
-			<div class="grid min-h-0 min-w-0 gap-5 lg:grid-rows-2">
-				<section class="flex min-h-0 min-w-0 flex-col rounded-xl border border-border bg-surface p-4">
+			<div class="grid min-h-0 min-w-0 gap-5 md:col-span-2 md:max-h-[calc(100vh-10rem)] md:grid-rows-2">
+				<section class="flex min-h-0 min-w-0 flex-col rounded-xl border border-border bg-surface p-4 md:overflow-hidden">
 					<h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-text-muted">RuleShield Live</h2>
 					<div class="grid gap-3 md:grid-cols-2">
 						<div class="rounded-md border border-border bg-surface-elevated/40 px-3 py-2">
@@ -449,10 +581,8 @@
 							No RuleShield run data for the selected test yet.
 						</p>
 					{/if}
-					<div class="mt-3 min-h-0 min-w-0 flex-1 overflow-auto rounded-md border border-border bg-[#0A0C10] p-3 font-mono text-[12px]">
-						{#if latestRuleEvents.length === 0}
-							<p class="text-text-muted">No recent rule events.</p>
-						{:else}
+					{#if latestRuleEvents.length > 0}
+						<div class="mt-3 min-h-0 min-w-0 flex-1 overflow-auto rounded-md border border-border bg-[#0A0C10] p-3 font-mono text-[12px]">
 							{#each latestRuleEvents as event}
 								<div class="mb-1 flex gap-2 text-text-secondary">
 									<span class="text-text-muted">{event.created_at ?? '-'}</span>
@@ -465,13 +595,13 @@
 									{/if}
 								</div>
 							{/each}
-						{/if}
-					</div>
+						</div>
+					{/if}
 				</section>
 
-				<section class="flex min-h-0 min-w-0 flex-col rounded-xl border border-border bg-surface p-4">
+				<section class="flex min-h-0 min-w-0 flex-col rounded-xl border border-border bg-surface p-4 md:overflow-hidden">
 					<div class="mb-3 flex items-center justify-between">
-						<h2 class="text-sm font-semibold uppercase tracking-wider text-text-muted">Prompt/Antwort Monitor</h2>
+						<h2 class="text-sm font-semibold uppercase tracking-wider text-text-muted">Prompt Monitor</h2>
 						<div class="min-w-0 text-xs text-text-muted">
 							Run: <span class="font-mono text-text-secondary">{selectedRunId || '-'}</span>
 							{#if selectedRunStatus}

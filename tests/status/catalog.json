@@ -1,0 +1,82 @@
+{
+  "tests": [
+    {
+      "id": "smoke_pytests",
+      "name": "Python smoke/unit",
+      "script_path": "tests/test_imports.py + tests/test_prompt_training.py",
+      "group": "commit"
+    },
+    {
+      "id": "story_install_init_restore",
+      "name": "Story: install/init/restore",
+      "script_path": "tests/stories/story_install_init_restore.sh",
+      "group": "commit"
+    },
+    {
+      "id": "story_gateway_honors_config_port",
+      "name": "Story: gateway honors config port",
+      "script_path": "tests/stories/story_gateway_honors_config_port.sh",
+      "group": "commit"
+    },
+    {
+      "id": "story_clean_install_no_post_steps",
+      "name": "Demo: clean install needs no post-install steps",
+      "script_path": "demo/test_clean_install_no_post_steps.sh",
+      "group": "full"
+    },
+    {
+      "id": "story_rule_trigger_flow",
+      "name": "Story: rule trigger flow",
+      "script_path": "tests/stories/story_rule_trigger_flow.sh",
+      "group": "commit"
+    },
+    {
+      "id": "story_health_check_flow",
+      "name": "Story: health-check flow",
+      "script_path": "tests/stories/story_health_check_flow.sh",
+      "group": "core"
+    },
+    {
+      "id": "story_monitor_contract",
+      "name": "Story: monitor contract",
+      "script_path": "tests/stories/story_monitor_contract.sh",
+      "group": "core"
+    },
+    {
+      "id": "story_feedback_loop",
+      "name": "Story: feedback loop",
+      "script_path": "tests/stories/story_feedback_loop.sh",
+      "group": "core"
+    },
+    {
+      "id": "story_health_check_flow_openrouter_stepfun",
+      "name": "Story: health-check flow (OpenRouter StepFun)",
+      "script_path": "tests/stories/story_health_check_flow_openrouter_stepfun.sh",
+      "group": "full"
+    },
+    {
+      "id": "story_monitor_healthcheck_e2e",
+      "name": "Story: monitor-driven health-check e2e (browser)",
+      "script_path": "tests/stories/story_monitor_healthcheck_e2e.sh",
+      "group": "full"
+    },
+    {
+      "id": "extended_hermes_user_suite",
+      "name": "Extended: hermes user suite",
+      "script_path": "demo/test_training_hermes_user_suite.sh",
+      "group": "full"
+    },
+    {
+      "id": "extended_vibecoder_suite",
+      "name": "Extended: vibecoder suite",
+      "script_path": "demo/test_training_vibecoder_suite.sh",
+      "group": "full"
+    },
+    {
+      "id": "extended_shadow_coverage",
+      "name": "Extended: shadow coverage check",
+      "script_path": "demo/test_shadow_coverage_check.sh",
+      "group": "full"
+    }
+  ]
+}

@@ -20,7 +20,7 @@
 import OriginalOpenAI from 'openai';
 import type { ClientOptions } from 'openai';
 
-const RULESHIELD_PROXY_URL = process.env.RULESHIELD_PROXY_URL || 'http://127.0.0.1:8337/v1';
+const RULESHIELD_PROXY_URL = process.env.RULESHIELD_PROXY_URL || 'http://127.0.0.1:8347/v1';
 
 /**
  * Drop-in replacement for the OpenAI client that routes through RuleShield proxy.
@@ -29,7 +29,7 @@ const RULESHIELD_PROXY_URL = process.env.RULESHIELD_PROXY_URL || 'http://127.0.0
  * All other options are passed through to the real OpenAI client.
  *
  * Environment variables:
- *   RULESHIELD_PROXY_URL: Override proxy URL (default: http://127.0.0.1:8337/v1)
+ *   RULESHIELD_PROXY_URL: Override proxy URL (default: http://127.0.0.1:8347/v1)
  *   OPENAI_API_KEY: Your OpenAI API key (passed through to proxy)
  */
 export class OpenAI extends OriginalOpenAI {

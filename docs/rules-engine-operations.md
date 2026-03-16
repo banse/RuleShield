@@ -11,7 +11,7 @@ It is written for the practical questions that come up during live usage:
 - when to pause a rule
 - when a candidate is ready for promotion
 
-This is the operational companion to the technical reference in [rules-engine.md](/Users/banse/codex/hermes/ruleshield-hermes/docs/rules-engine.md).
+This is the operational companion to the technical reference in [rules-engine.md](./rules-engine.md).
 
 ## Testing Philosophy
 
@@ -77,7 +77,7 @@ This is the best way to see whether the rule pack is production-worthy.
 Run RuleShield with shadow mode enabled on the local proxy:
 
 ```bash
-env RULESHIELD_SHADOW_MODE=true /Users/banse/codex/hermes/ruleshield-hermes/.venv/bin/python -m ruleshield.proxy
+env RULESHIELD_SHADOW_MODE=true ./.venv/bin/python -m ruleshield.proxy
 ```
 
 ### Hermes
@@ -109,7 +109,7 @@ If you want a clean measurement window, clear old shadow comparisons first.
 Current reliable direct reset:
 
 ```bash
-sqlite3 /Users/banse/.ruleshield/cache.db "DELETE FROM shadow_log;"
+sqlite3 ~/.ruleshield/cache.db "DELETE FROM shadow_log;"
 ```
 
 After reset, verify:

@@ -20,17 +20,17 @@ It covers:
 
 The implementation described here is based on these runtime modules:
 
-- [rules.py](/Users/banse/codex/hermes/ruleshield-hermes/ruleshield/rules.py)
-- [feedback.py](/Users/banse/codex/hermes/ruleshield-hermes/ruleshield/feedback.py)
-- [proxy.py](/Users/banse/codex/hermes/ruleshield-hermes/ruleshield/proxy.py)
-- [cache.py](/Users/banse/codex/hermes/ruleshield-hermes/ruleshield/cache.py)
+- [rules.py](../ruleshield/rules.py)
+- [feedback.py](../ruleshield/feedback.py)
+- [proxy.py](../ruleshield/proxy.py)
+- [cache.py](../ruleshield/cache.py)
 
-The active local rule packs referenced below come from:
+The active local rule packs referenced below come from the user's RuleShield home:
 
-- [default_hermes.json](/Users/banse/.ruleshield/rules/default_hermes.json)
-- [hermes_advanced.json](/Users/banse/.ruleshield/rules/hermes_advanced.json)
-- [suggested.json](/Users/banse/.ruleshield/rules/suggested.json)
-- [shadow_control_rules.json](/Users/banse/.ruleshield/rules/candidates/shadow_control_rules.json)
+- `~/.ruleshield/rules/default_hermes.json`
+- `~/.ruleshield/rules/hermes_advanced.json`
+- `~/.ruleshield/rules/suggested.json`
+- `~/.ruleshield/rules/candidates/shadow_control_rules.json`
 
 ## Runtime Role in the Proxy
 
@@ -722,7 +722,7 @@ The following reflects the rules currently on disk in the local test environment
 
 ### Default production rules
 
-From [default_hermes.json](/Users/banse/.ruleshield/rules/default_hermes.json):
+From `default_hermes.json` in `~/.ruleshield/rules/`:
 
 - `greeting_simple`
   - greetings like `hello`, `hi`, `hey`, `hallo`
@@ -743,7 +743,7 @@ From [default_hermes.json](/Users/banse/.ruleshield/rules/default_hermes.json):
 
 ### Advanced production rules
 
-From [hermes_advanced.json](/Users/banse/.ruleshield/rules/hermes_advanced.json):
+From `hermes_advanced.json` in `~/.ruleshield/rules/`:
 
 - `file_listing_request`
   - file listing / directory listing prompts
@@ -772,7 +772,7 @@ From [hermes_advanced.json](/Users/banse/.ruleshield/rules/hermes_advanced.json)
 
 ### Suggested production rules
 
-From [suggested.json](/Users/banse/.ruleshield/rules/suggested.json):
+From `suggested.json` in `~/.ruleshield/rules/`:
 
 - `suggested_3a9fb9a0`
   - CPU acronym explanation
@@ -783,7 +783,7 @@ These come from observed request similarity and represent auto-suggested, still 
 
 ### Candidate rules
 
-From [shadow_control_rules.json](/Users/banse/.ruleshield/rules/candidates/shadow_control_rules.json):
+From `shadow_control_rules.json` in `~/.ruleshield/rules/candidates/`:
 
 - `shadow_control_any_model`
   - control candidate used for stable shadow diagnostics

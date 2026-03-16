@@ -12,7 +12,7 @@ It is organized around:
 - phased implementation
 - testing and rollout
 
-This plan assumes the architectural direction from [cron-optimization-spec.md](/Users/banse/codex/hermes/ruleshield-hermes/docs/cron-optimization-spec.md):
+This plan assumes the architectural direction from [cron-optimization-spec.md](./cron-optimization-spec.md):
 
 - do not treat recurring jobs as ordinary rules
 - introduce a `Cron Optimization Profile`
@@ -216,7 +216,7 @@ This wrapper is especially useful if we want:
 
 ## Existing files to extend
 
-### [cli.py](/Users/banse/codex/hermes/ruleshield-hermes/ruleshield/cli.py)
+### [cli.py](../ruleshield/cli.py)
 
 Add commands:
 
@@ -227,7 +227,7 @@ Add commands:
 - `run-cron-shadow`
 - `activate-cron-profile`
 
-### [mcp_server.py](/Users/banse/codex/hermes/ruleshield-hermes/ruleshield/mcp_server.py)
+### [mcp_server.py](../ruleshield/mcp_server.py)
 
 Add tools:
 
@@ -235,7 +235,7 @@ Add tools:
 - `ruleshield_list_cron_profiles`
 - `ruleshield_run_cron_shadow`
 
-### [proxy.py](/Users/banse/codex/hermes/ruleshield-hermes/ruleshield/proxy.py)
+### [proxy.py](../ruleshield/proxy.py)
 
 Add endpoints:
 
@@ -591,9 +591,9 @@ Recurring tasks usually want:
 
 ### Files
 
-- [cli.py](/Users/banse/codex/hermes/ruleshield-hermes/ruleshield/cli.py)
-- [mcp_server.py](/Users/banse/codex/hermes/ruleshield-hermes/ruleshield/mcp_server.py)
-- new [cron_optimizer.py](/Users/banse/codex/hermes/ruleshield-hermes/ruleshield/cron_optimizer.py)
+- [cli.py](../ruleshield/cli.py)
+- [mcp_server.py](../ruleshield/mcp_server.py)
+- new [cron_optimizer.py](../ruleshield/cron_optimizer.py)
 
 ### Deliverable
 
@@ -609,9 +609,9 @@ Recurring tasks usually want:
 
 ### Files
 
-- new [cron_optimizer.py](/Users/banse/codex/hermes/ruleshield-hermes/ruleshield/cron_optimizer.py)
+- new [cron_optimizer.py](../ruleshield/cron_optimizer.py)
 - optional helpers in `config.py` for profile dirs
-- [cli.py](/Users/banse/codex/hermes/ruleshield-hermes/ruleshield/cli.py)
+- [cli.py](../ruleshield/cli.py)
 
 ### Deliverable
 
@@ -628,10 +628,10 @@ Recurring tasks usually want:
 
 ### Files
 
-- new [cron_validation.py](/Users/banse/codex/hermes/ruleshield-hermes/ruleshield/cron_validation.py)
-- new [hermes_runner.py](/Users/banse/codex/hermes/ruleshield-hermes/ruleshield/hermes_runner.py)
-- [cache.py](/Users/banse/codex/hermes/ruleshield-hermes/ruleshield/cache.py) or a neighboring DB helper
-- [cli.py](/Users/banse/codex/hermes/ruleshield-hermes/ruleshield/cli.py)
+- new [cron_validation.py](../ruleshield/cron_validation.py)
+- new [hermes_runner.py](../ruleshield/hermes_runner.py)
+- [cache.py](../ruleshield/cache.py) or a neighboring DB helper
+- [cli.py](../ruleshield/cli.py)
 
 ### Deliverable
 
@@ -647,8 +647,8 @@ Recurring tasks usually want:
 
 ### Files
 
-- [cli.py](/Users/banse/codex/hermes/ruleshield-hermes/ruleshield/cli.py)
-- [proxy.py](/Users/banse/codex/hermes/ruleshield-hermes/ruleshield/proxy.py) if API activation is added
+- [cli.py](../ruleshield/cli.py)
+- [proxy.py](../ruleshield/proxy.py) if API activation is added
 
 ### Deliverable
 

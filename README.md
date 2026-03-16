@@ -10,46 +10,45 @@
 
 RuleShield is an intelligent LLM cost optimizer that sits between your Hermes Agent and any LLM provider. It learns your agent's patterns through 5 layers of defense, routes requests to the cheapest capable model, and improves its own rules through a feedback loop. Tested against the Nous Research API: **47-82% cost savings proven**.
 
-## Reviewer Quickstart
-
-The most reliable way to evaluate the current submission is the Hermes/OpenAI path.
+## Quickstart (npm, recommended)
 
 ```bash
 git clone https://github.com/banse/RuleShield.git
 cd RuleShield
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -e .
-ruleshield init --hermes
-PYTHONPATH="$PWD" ./.venv/bin/python -m uvicorn ruleshield.proxy:app --host 127.0.0.1 --port 8337
+npm run setup:hermes
+npm run start
 ```
 
-In a second terminal:
+Open:
+- `http://127.0.0.1:8347/test-monitor` (temporary default UI)
+- `http://127.0.0.1:8347/monitor` (live metrics)
+
+Run first demo check in a second terminal:
 
 ```bash
 cd RuleShield
-source .venv/bin/activate
 bash ./demo/test_training_health_check.sh
 ```
 
-Recommended review path:
-- start the proxy with the `uvicorn` command above
-- use Hermes through the patched local config
-- run `demo/test_training_health_check.sh` first
-
 Notes:
-- this path expects local Hermes auth to already exist, typically via `~/.codex/auth.json`
-- the OpenAI/Hermes path is the primary demo path for this hackathon submission
+- uses the local Hermes-auth based setup
+- default local proxy port is `8347`
+- training/test scripts read the configured proxy port automatically
+- load the page and run demo scripts only after setting `OPENROUTER_API_KEY` or `OPENAI_API_KEY` in `~/.hermes/.env`
 
-## Quick Start
+If setup fails, rerun:
+
+```bash
+npm run setup:hermes
+```
+
+## Alternative (pip / manual)
 
 ```bash
 pip install ruleshield-hermes
 ruleshield init
 ruleshield start
 ```
-
-Point your Hermes Agent at `http://127.0.0.1:8337`. No code changes. Costs drop immediately.
 
 ### Drop-in SDK Wrapper
 
@@ -315,7 +314,7 @@ All settings live in `~/.ruleshield/config.yaml`:
 ```yaml
 provider_url: https://api.openai.com    # upstream LLM provider
 api_key: ""                              # or set RULESHIELD_API_KEY env var
-port: 8337                               # proxy port
+port: 8347                               # proxy port
 cache_enabled: true
 rules_enabled: true
 router_enabled: true                     # smart model routing

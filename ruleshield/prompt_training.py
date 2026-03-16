@@ -1148,7 +1148,7 @@ def _parse_dotenv(path: Path) -> dict[str, str]:
     return values
 
 
-def _extract_runtime_bearer(runtime_home: Path) -> str | None:
+def _extract_runtime_bearer(runtime_home: Path, model: str | None = None) -> str | None:
     def _clean_token(value: Any) -> str | None:
         if value is None:
             return None
@@ -1159,53 +1159,12 @@ def _extract_runtime_bearer(runtime_home: Path) -> str | None:
             return None
         return token
 
-    # Prefer auth tokens copied from active Hermes/Codex sessions.
-    # These are usually the correct credentials for the configured provider.
-    auth_path = runtime_home / ".hermes" / "auth.json"
-    if auth_path.is_file():
-        try:
-            auth = json.loads(auth_path.read_text(encoding="utf-8"))
-            providers = auth.get("providers", {})
-            if isinstance(providers, dict):
-                for provider in providers.values():
-                    if not isinstance(provider, dict):
-                        continue
-                    # Provider payloads can store tokens directly or under a
-                    # nested "tokens" object.
-                    token_sources: list[dict[str, Any]] = [provider]
-                    nested = provider.get("tokens")
-                    if isinstance(nested, dict):
-                        token_sources.append(nested)
-                    for source in token_sources:
-                        for token_key in ("access_token", "api_key", "token"):
-                            token = _clean_token(source.get(token_key))
-                            if token:
-                                return token
-        except Exception:
-            pass
-
-    codex_auth_path = runtime_home / ".codex" / "auth.json"
-    if codex_auth_path.is_file():
-        try:
-            auth = json.loads(codex_auth_path.read_text(encoding="utf-8"))
-            token_sources: list[dict[str, Any]] = []
-            if isinstance(auth, dict):
-                token_sources.append(auth)
-                nested = auth.get("tokens")
-                if isinstance(nested, dict):
-                    token_sources.append(nested)
-            for source in token_sources:
-                # Prefer OAuth access token over OPENAI_API_KEY metadata field.
-                for token_key in ("access_token", "api_key", "token", "OPENAI_API_KEY"):
-                    token = _clean_token(source.get(token_key))
-                    if token:
-                        return token
-        except Exception:
-            pass
-
-    # Finally, fall back to static keys in runtime dotenv.
+    # Runtime auth for training/monitor flows is sourced from Hermes .env.
     env_vars = _parse_dotenv(runtime_home / ".hermes" / ".env")
-    for key in ("OPENAI_API_KEY", "OPENROUTER_API_KEY"):
+    prefers_openrouter = _is_openrouter_like_model(model or "")
+    primary_key = "OPENROUTER_API_KEY" if prefers_openrouter else "OPENAI_API_KEY"
+    secondary_key = "OPENAI_API_KEY" if prefers_openrouter else "OPENROUTER_API_KEY"
+    for key in (primary_key, secondary_key):
         token = _clean_token(env_vars.get(key))
         if token:
             return token
@@ -1219,7 +1178,7 @@ def _emit_proxy_probe(
     prompt: str,
     runtime_home: Path,
 ) -> str:
-    token = _extract_runtime_bearer(runtime_home)
+    token = _extract_runtime_bearer(runtime_home, model=model)
     headers: dict[str, str] = {"content-type": "application/json"}
     if token:
         headers["authorization"] = f"Bearer {token}"
@@ -1253,7 +1212,7 @@ def _send_prompt_direct_via_proxy(
     runtime_home: Path,
 ) -> str:
     """Low-overhead fallback when Hermes agent calls fail with hard 402 limits."""
-    token = _extract_runtime_bearer(runtime_home)
+    token = _extract_runtime_bearer(runtime_home, model=model)
     headers: dict[str, str] = {"content-type": "application/json"}
     if token:
         headers["authorization"] = f"Bearer {token}"
@@ -1543,11 +1502,11 @@ def run_prompt_training(
                 )
             )
     except Exception as exc:
-        _emit_training_log(
-            f"[fallback] type=external_runner reason=local_import_failed detail={type(exc).__name__}: {exc}"
-        )
         runtime = _detect_hermes_python()
         if not runtime:
+            _emit_training_log(
+                f"[error] type=runner_selection reason=local_import_failed no_external_runtime detail={type(exc).__name__}: {exc}"
+            )
             failure_error = str(exc)
         else:
             fallback_python, hermes_root = runtime
@@ -1555,7 +1514,10 @@ def run_prompt_training(
             hermes_available = True
             hermes_import_target = f"external-python:{fallback_python}"
             _emit_training_log(
-                f"[fallback] type=external_runner activated python={fallback_python}"
+                f"[runner] mode=external reason=local_import_unavailable python={fallback_python}"
+            )
+            _emit_training_log(
+                f"[runner] local_import_detail={type(exc).__name__}: {exc}"
             )
             try:
                 for step in scenario.steps[:prompt_limit]:

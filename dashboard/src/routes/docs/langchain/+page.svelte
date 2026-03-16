@@ -35,7 +35,7 @@ ruleshield start</pre>
 <span class="comment"># Point LangChain at RuleShield proxy</span>
 llm = ChatOpenAI(
     model=<span class="string">"gpt-4o"</span>,
-    base_url=<span class="string">"http://localhost:8337/v1"</span>,
+    base_url=<span class="string">"http://localhost:&lt;PORT&gt;/v1"</span>,
     api_key=<span class="string">"your-api-key"</span>,
 )
 
@@ -44,7 +44,7 @@ response = llm.invoke(<span class="string">"Hello, how are you?"</span>)</pre>
 
 <p class="docs-p">
 	That is it. Every call through <code class="docs-code">ChatOpenAI</code> now flows through
-	RuleShield's 4-layer pipeline: cache, rules, bridge, and smart router.
+	RuleShield's 5-layer pipeline: cache, rules, template optimizer, bridge, and smart router.
 </p>
 
 <!-- LangChain Agent Example -->
@@ -61,7 +61,7 @@ response = llm.invoke(<span class="string">"Hello, how are you?"</span>)</pre>
 
 llm = ChatOpenAI(
     model=<span class="string">"gpt-4o"</span>,
-    base_url=<span class="string">"http://localhost:8337/v1"</span>,
+    base_url=<span class="string">"http://localhost:&lt;PORT&gt;/v1"</span>,
     api_key=<span class="string">"your-api-key"</span>,
 )
 
@@ -84,7 +84,7 @@ result = executor.invoke(&#123;<span class="string">"input"</span>: <span class=
 	LangChain's OpenAI integration picks this up automatically.
 </p>
 
-<pre class="docs-pre"><span class="keyword">export</span> OPENAI_BASE_URL=<span class="string">http://localhost:8337/v1</span>
+<pre class="docs-pre"><span class="keyword">export</span> OPENAI_BASE_URL=<span class="string">http://localhost:&lt;PORT&gt;/v1</span>
 <span class="comment"># LangChain picks this up automatically</span></pre>
 
 <p class="docs-p">

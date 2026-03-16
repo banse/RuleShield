@@ -74,7 +74,7 @@ The proxy runs on `http://localhost:8000` by default. Point your LLM client at t
 
 ## Running Tests
 
-Run the full test suite with pytest:
+Run the python test suite with pytest:
 
 ```bash
 pytest
@@ -86,7 +86,37 @@ Run tests with verbose output to see individual test results:
 pytest -v
 ```
 
-If you are adding a new feature, write tests to cover it before submitting your PR.
+For product-level confidence, use the user-story suites:
+
+```bash
+# Fast gate (runs on every commit hook)
+bash tests/run-commit-suite.sh
+
+# Core gate (runs on every push hook)
+bash tests/run-core-suite.sh
+
+# Extended suite (release/demo hardening)
+bash tests/run-full-suite.sh
+```
+
+Install git hooks once per clone:
+
+```bash
+bash tests/install-git-hooks.sh
+```
+
+That configures:
+- `pre-commit` -> `tests/run-commit-suite.sh`
+- `pre-push` -> `tests/run-core-suite.sh`
+
+### Coverage policy
+
+New features must be covered by the user-story test suite.
+
+Rule:
+- If a feature changes an existing user workflow, update the existing story test.
+- If a feature introduces a new user workflow, add a new story test.
+- No user-story coverage means the feature is not ready to commit.
 
 ## Adding a Rule Pack
 
@@ -288,7 +318,7 @@ test(router): add edge case tests for complexity scoring
 
 ## Getting Help
 
-- **Questions**: Open a thread in [GitHub Discussions](https://github.com/ruleshield/ruleshield-hermes/discussions).
+- **Questions**: Open a thread in [GitHub Discussions](https://github.com/banse/RuleShield/discussions).
 - **Bug reports**: Use the Bug Report issue template.
 - **Feature ideas**: Use the Feature Request issue template.
 - **Security issues**: See [SECURITY.md](SECURITY.md) for responsible disclosure instructions. Do not open a public issue for security vulnerabilities.

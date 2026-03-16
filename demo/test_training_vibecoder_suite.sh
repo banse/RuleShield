@@ -7,8 +7,9 @@ set -euo pipefail
 # 3) Full baseline scenario (vibecoder dashboard)
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PYTHON_BIN="${PYTHON_BIN:-$ROOT_DIR/.venv/bin/python}"
-PROXY_URL="${PROXY_URL:-http://127.0.0.1:8337}"
+source "$ROOT_DIR/demo/_helpers.sh"
+PYTHON_BIN="${PYTHON_BIN:-$(ruleshield_python_bin)}"
+PROXY_URL="${PROXY_URL:-$(ruleshield_default_proxy_url)}"
 MODEL="${MODEL:-gpt-5.1-codex-mini}"
 FALLBACK_MODEL="${FALLBACK_MODEL:-gpt-4.1-mini}"
 OUTPUT_BASE="${OUTPUT_BASE:-$ROOT_DIR/test-runs/training-suite}"
@@ -30,7 +31,6 @@ fi
 
 detect_auth_method() {
 	"$PYTHON_BIN" - <<'PY'
-import json
 import os
 from pathlib import Path
 
@@ -49,24 +49,6 @@ def parse_dotenv(path: Path):
         out[k.strip()] = v.strip().strip('"').strip("'")
     return out
 
-def has_codex_auth() -> bool:
-    path = Path.home() / ".codex" / "auth.json"
-    if not path.is_file():
-        return False
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
-        return False
-    if not isinstance(data, dict):
-        return False
-    for src in (data, data.get("tokens", {})):
-        if isinstance(src, dict):
-            for key in ("access_token", "api_key", "token", "OPENAI_API_KEY"):
-                val = src.get(key)
-                if isinstance(val, str) and val.strip() and val.strip().lower() not in {"none", "null"}:
-                    return True
-    return False
-
 def is_openrouter_route() -> bool:
     if provider_hint == "openrouter":
         return True
@@ -75,23 +57,15 @@ def is_openrouter_route() -> bool:
     return "/" in model
 
 if is_openrouter_route():
-    if (os.getenv("RULESHIELD_OPENROUTER_API_KEY") or "").strip():
-        print("OpenRouter API key (RULESHIELD_OPENROUTER_API_KEY)")
-    elif (os.getenv("OPENROUTER_API_KEY") or "").strip():
-        print("OpenRouter API key (OPENROUTER_API_KEY)")
-    elif parse_dotenv(Path.home() / ".hermes" / ".env").get("OPENROUTER_API_KEY", "").strip():
+    if parse_dotenv(Path.home() / ".hermes" / ".env").get("OPENROUTER_API_KEY", "").strip():
         print("OpenRouter API key (~/.hermes/.env)")
-    elif parse_dotenv(Path.home() / ".ruleshield" / ".env").get("OPENROUTER_API_KEY", "").strip():
-        print("OpenRouter API key (~/.ruleshield/.env)")
     else:
-        print("OpenRouter (no key detected)")
+        print("OpenRouter (no key in ~/.hermes/.env)")
 else:
-    if (os.getenv("RULESHIELD_API_KEY") or "").strip():
-        print("RuleShield API key (RULESHIELD_API_KEY)")
-    elif has_codex_auth():
-        print("ChatGPT OAuth (~/.codex/auth.json)")
+    if parse_dotenv(Path.home() / ".hermes" / ".env").get("OPENAI_API_KEY", "").strip():
+        print("OpenAI API key (~/.hermes/.env)")
     else:
-        print("Passthrough/unknown (Authorization header dependent)")
+        print("OpenAI (no key in ~/.hermes/.env)")
 PY
 }
 

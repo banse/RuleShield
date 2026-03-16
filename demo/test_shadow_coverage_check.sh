@@ -7,8 +7,9 @@ set -euo pipefail
 # - flags rules that hit without persisting shadow comparisons
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PYTHON_BIN="${PYTHON_BIN:-$ROOT_DIR/.venv/bin/python}"
-PROXY_URL="${PROXY_URL:-http://127.0.0.1:8337}"
+source "$ROOT_DIR/demo/_helpers.sh"
+PYTHON_BIN="${PYTHON_BIN:-$(ruleshield_python_bin)}"
+PROXY_URL="${PROXY_URL:-$(ruleshield_default_proxy_url)}"
 MODEL="${MODEL:-gpt-5.1-codex-mini}"
 OUTPUT_BASE="${OUTPUT_BASE:-$ROOT_DIR/test-runs/shadow-coverage-check}"
 MAX_STEPS="${MAX_STEPS:-}"

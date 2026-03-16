@@ -96,7 +96,7 @@
 				},
 				{
 					title: 'Architecture',
-					description: '4-layer pipeline, shadow mode, feedback loop',
+					description: '5-layer pipeline, shadow mode, feedback loop',
 					href: '/docs/architecture',
 					color: 'primary'
 				},
@@ -138,7 +138,7 @@
 				{
 					title: 'GitHub',
 					description: 'Source code, issues, and contributions',
-					href: 'https://github.com/banse/ruleshield-hermes',
+					href: 'https://github.com/banse/RuleShield',
 					color: 'warning',
 					external: true
 				},
@@ -152,7 +152,7 @@
 				{
 					title: 'Hackathon Submission',
 					description: 'Submission details and project overview',
-					href: 'https://github.com/banse/ruleshield-hermes/blob/main/HACKATHON_SUBMISSION.md',
+					href: 'https://github.com/banse/RuleShield/blob/main/HACKATHON_SUBMISSION.md',
 					color: 'warning',
 					external: true
 				}

@@ -1,6 +1,6 @@
 # @ruleshield/sdk
 
-Drop-in OpenAI SDK wrapper that routes through [RuleShield](https://github.com/banse/ruleshield-hermes) proxy for automatic LLM cost optimization.
+Drop-in OpenAI SDK wrapper that routes through [RuleShield](https://github.com/banse/RuleShield) proxy for automatic LLM cost optimization.
 
 ## Installation
 

@@ -74,10 +74,10 @@
 </table>
 
 <!-- Layer 2: Rules -->
-<h2 class="docs-h2" id="rule-engine">Layer 2: SAP-Inspired Rule Engine</h2>
+<h2 class="docs-h2" id="rule-engine">Layer 2: Weighted Rule Engine</h2>
 
 <p class="docs-p">
-	A pattern-matching engine inspired by enterprise rule systems. Rules define patterns to match against
+	A pattern-matching engine with weighted scoring. Rules define patterns to match against
 	incoming prompts and provide pre-defined responses when confidence is high enough.
 </p>
 

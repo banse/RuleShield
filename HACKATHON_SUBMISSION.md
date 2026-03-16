@@ -6,10 +6,10 @@ Every AI agent has a dirty secret: most of its API calls are wasted money. Run a
 
 ## The Solution
 
-RuleShield is a transparent proxy that sits between your Hermes Agent and any LLM. It learns your agent's patterns and intercepts the ones that do not need an LLM. Three commands, zero code changes, immediate savings.
+RuleShield is a transparent proxy that sits between your Hermes Agent and any LLM. It learns your agent's patterns and intercepts the ones that do not need an LLM. A short setup, zero code changes, immediate savings.
 
 ```bash
-pip install ruleshield-hermes && ruleshield init && ruleshield start
+pip install ruleshield-hermes && ruleshield init --hermes && ruleshield start
 ```
 
 ## 5 Layers of Intelligence
@@ -17,7 +17,7 @@ pip install ruleshield-hermes && ruleshield init && ruleshield start
 Not just a cache. Five layers of cost defense, each smarter than the last:
 
 1. **Semantic Cache** -- Exact hash + embedding similarity. Identical or rephrased questions get instant answers. Cost: $0.
-2. **SAP-Inspired Rule Engine** -- 75 rules across 4 packs (default, advanced, customer support, coding assistant). Weighted keyword and regex scoring with confidence levels (CONFIRMED/LIKELY/POSSIBLE). Auto-extracts new rules from traffic. Cost: $0.
+2. **Weighted Rule Engine** -- 75 rules across 4 packs (default, advanced, customer support, coding assistant). Weighted keyword and regex scoring with confidence levels (CONFIRMED/LIKELY/POSSIBLE). Auto-extracts new rules from traffic. Cost: $0.
 3. **Template Optimizer** -- Discovers recurring prompt structures, caches fixed portions, sends only variable content to the LLM. Cost: $0.
 4. **Hermes Bridge** -- Optional local agent on a cheap model handles medium-complexity tasks. Cost: ~$0.001.
 5. **Smart Router** -- Complexity classifier routes across 80+ models to cheap/mid/premium tiers. Simple questions never touch expensive APIs. Cost: varies.
@@ -32,7 +32,8 @@ Not just a proxy -- a native Hermes citizen:
 
 - **Hermes Skills**: Ask your agent "show me my savings" or "what rules have you learned?" and it reports back.
 - **MCP Server**: 4 tools (get_stats, list_rules, add_rule, get_savings) via JSON-RPC stdio. The agent can query and modify its own optimization layer.
-- **Config Integration**: `ruleshield init` patches your Hermes config automatically. No manual setup.
+- **Config Integration**: `ruleshield init --hermes` patches an existing Hermes config or creates a minimal starter config for a blank local setup.
+- **Python API Path**: Hermes can also be driven programmatically, which makes RuleShield useful not just for interactive chats but for repeatable scripted agent workflows.
 
 ## The Path to Self-Evolution
 
@@ -42,6 +43,18 @@ The feedback loop is step one. RL training stubs are already in place:
 - **DSPy/GEPA**: Guided Evolution for prompt-based agents
 
 Today RuleShield saves costs. Tomorrow it evolves its own optimization strategy. The agent that optimizes itself.
+
+There is also a practical next step beyond interception: workflow shrinking.
+
+For repeated Hermes workflows, RuleShield can evolve toward splitting work into:
+
+- deterministic pre-processing code
+- a smaller core prompt for the part that actually needs an LLM
+- deterministic post-processing code
+
+That is especially promising for Hermes Python API workflows and cron-like recurring tasks, where the same structure appears again and again.
+
+A concrete extension of this idea is a Cron Optimizer / Replacer: recurring Hermes jobs can be decomposed into deterministic pre-processing, a smaller core prompt, and deterministic post-processing. That lowers token spend even further and turns repeated automations into something RuleShield can continuously optimize.
 
 ## Proven Results
 
@@ -83,4 +96,4 @@ One command. 47-82% proven savings. 30 commits. An agent that optimizes itself.
 
 Built for the [NousResearch Hermes Agent Hackathon](https://github.com/NousResearch) by the RuleShield team.
 
-Source: [GitHub](https://github.com/ruleshield/ruleshield-hermes)
+Source: [GitHub](https://github.com/banse/RuleShield)

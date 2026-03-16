@@ -15,7 +15,7 @@
 
 <h2 class="docs-h2">Test Preconditions</h2>
 <ul class="docs-p list-disc list-inside space-y-1">
-	<li>Proxy running on <code class="docs-code">127.0.0.1:8337</code></li>
+	<li>Proxy running on <code class="docs-code">127.0.0.1:&lt;PORT&gt;</code></li>
 	<li><code class="docs-code">shadow_mode: true</code> in <code class="docs-code">~/.ruleshield/config.yaml</code></li>
 	<li>Baseline rules enabled (workflow-intents on, overly strict smalltalk rules optional)</li>
 	<li>Model fixed for the full session to reduce drift in comparisons</li>
@@ -87,13 +87,13 @@ scan support tickets each morning and group by severity</pre>
 
 <h2 class="docs-h2">Useful Commands</h2>
 <pre class="docs-pre"># shadow summary
-curl -s http://127.0.0.1:8337/api/shadow
+curl -s http://127.0.0.1:&lt;PORT&gt;/api/shadow
 
 # live rules
-curl -s http://127.0.0.1:8337/api/rules
+curl -s http://127.0.0.1:&lt;PORT&gt;/api/rules
 
 # minimal rule event log
-curl -s "http://127.0.0.1:8337/api/rule-events?limit=100"
+curl -s "http://127.0.0.1:&lt;PORT&gt;/api/rule-events?limit=100"
 
 # recent feedback
-curl -s "http://127.0.0.1:8337/api/feedback?limit=50"</pre>
+curl -s "http://127.0.0.1:&lt;PORT&gt;/api/feedback?limit=50"</pre>

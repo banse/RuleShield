@@ -48,7 +48,7 @@
 	The active profile injects deterministic pre/post structure and calls a compact model path.
 </p>
 
-<pre class="docs-pre">curl -X POST http://127.0.0.1:8337/api/cron-profiles/profile_123/execute \
+<pre class="docs-pre">curl -X POST http://127.0.0.1:&lt;PORT&gt;/api/cron-profiles/profile_123/execute \
   -H "Content-Type: application/json" \
   -d &#123;
     "payload_text": "Email batch for 2026-03-15",

@@ -1,0 +1,22 @@
+RECORDING STACK
+
+Screen
+- Cmd+Shift+5
+- or Screen Studio
+
+Editing
+- CapCut
+- or Descript
+
+Voice
+- own voice preferred
+- or TTS with a warm, calm, low-energy, slightly rough male voice
+
+TARGET LENGTH
+- 75-90 seconds
+- hard max 120 seconds
+
+LIVE RULES
+- do not debug live
+- if the monitor looks noisy, use a stable finished run for the cutaway
+- use GPT-5.1 Mini for the main demo

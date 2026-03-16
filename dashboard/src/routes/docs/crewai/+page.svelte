@@ -32,7 +32,7 @@ ruleshield start</pre>
 
 <h3 class="docs-h3">Step 3: Configure CrewAI</h3>
 <pre class="docs-pre"><span class="keyword">import</span> os
-os.environ[<span class="string">"OPENAI_BASE_URL"</span>] = <span class="string">"http://localhost:8337/v1"</span>
+os.environ[<span class="string">"OPENAI_BASE_URL"</span>] = <span class="string">"http://localhost:&lt;PORT&gt;/v1"</span>
 os.environ[<span class="string">"OPENAI_API_KEY"</span>] = <span class="string">"your-api-key"</span>
 
 <span class="keyword">from</span> crewai <span class="keyword">import</span> Agent, Task, Crew

@@ -65,15 +65,15 @@ The optimized flow should separate:
 
 The current codebase already contains partial groundwork:
 
-- recurring prompt analysis in [cli.py](/Users/banse/codex/hermes/ruleshield-hermes/ruleshield/cli.py)
+- recurring prompt analysis in [cli.py](../ruleshield/cli.py)
   - `ruleshield analyze-crons`
-- direct prompt promotion to a direct rule endpoint in [cli.py](/Users/banse/codex/hermes/ruleshield-hermes/ruleshield/cli.py)
+- direct prompt promotion to a direct rule endpoint in [cli.py](../ruleshield/cli.py)
   - `ruleshield promote-rule`
-- direct response retrieval in [proxy.py](/Users/banse/codex/hermes/ruleshield-hermes/ruleshield/proxy.py)
+- direct response retrieval in [proxy.py](../ruleshield/proxy.py)
   - `GET /api/rules/{rule_id}/response`
-- MCP analysis support in [mcp_server.py](/Users/banse/codex/hermes/ruleshield-hermes/ruleshield/mcp_server.py)
+- MCP analysis support in [mcp_server.py](../ruleshield/mcp_server.py)
   - `_analyze_crons(...)`
-- a demo narrative for cron replacement in [test_cron_replacement.sh](/Users/banse/codex/hermes/ruleshield-hermes/demo/test_cron_replacement.sh)
+- a demo narrative for cron replacement in [test_cron_replacement.sh](../demo/test_cron_replacement.sh)
 
 The current engine is still mainly optimized for:
 

@@ -650,8 +650,17 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:5174", "http://localhost:4173"],
-    allow_methods=["GET", "POST"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:4173",
+        "http://localhost:4174",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
+        "http://127.0.0.1:4173",
+        "http://127.0.0.1:4174",
+    ],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -814,7 +823,7 @@ async def api_test_monitor_run_ruleshield(run_id: str):
         async def _build_live_preview(run_dir_value: str) -> dict[str, Any]:
             stats_snapshot = await api_stats()
             stats_payload = stats_snapshot if isinstance(stats_snapshot, dict) else {}
-            shadow_snapshot = await api_shadow()
+            shadow_snapshot = await api_shadow(recent=None, rule_id=None)
             shadow_payload = shadow_snapshot if isinstance(shadow_snapshot, dict) else {}
             requests_payload = await api_requests(limit=300)
             requests_list = requests_payload.get("requests", []) if isinstance(requests_payload, dict) else []
@@ -1076,7 +1085,7 @@ async def api_test_monitor_start(request: Request):
 
         stats_snapshot = await api_stats()
         stats_payload = stats_snapshot if isinstance(stats_snapshot, dict) else {}
-        shadow_snapshot = await api_shadow()
+        shadow_snapshot = await api_shadow(recent=None, rule_id=None)
         shadow_payload = shadow_snapshot if isinstance(shadow_snapshot, dict) else {}
         events_snapshot = await api_rule_events(limit=500)
         events_payload = events_snapshot if isinstance(events_snapshot, dict) else {}
@@ -1357,6 +1366,7 @@ async def api_runtime_config():
 @app.post("/api/runtime-config")
 async def api_update_runtime_config(request: Request):
     """Update minimal runtime config toggles and persist them locally."""
+    global smart_router
     try:
         payload = await request.json()
         if not isinstance(payload, dict):
@@ -1379,6 +1389,12 @@ async def api_update_runtime_config(request: Request):
         persisted = False
         if applied:
             persisted = _persist_runtime_settings(applied)
+            # Apply Smart Router toggle live so monitor/test flows don't require a restart.
+            if "router_enabled" in applied:
+                if applied["router_enabled"]:
+                    smart_router = SmartRouter(config=settings.router_config or None)
+                else:
+                    smart_router = None
 
         return {
             "applied": applied,
@@ -1459,6 +1475,13 @@ async def api_shadow(
     rule_id: str | None = Query(default=None),
 ):
     """Shadow mode comparison statistics for the dashboard."""
+    # This endpoint is also called internally (without FastAPI request parsing).
+    # Guard against receiving Query() objects as defaults in that code path.
+    if not isinstance(recent, (int, type(None))):
+        recent = None
+    if not isinstance(rule_id, (str, type(None))):
+        rule_id = None
+
     try:
         shadow_stats = await cache_manager.get_shadow_stats(limit=recent, rule_id=rule_id)
         tune_examples = await cache_manager.get_shadow_examples(

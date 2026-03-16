@@ -12,7 +12,7 @@
 
 <h3 class="docs-h3">Core</h3>
 <pre class="docs-pre">ruleshield init [--hermes]
-ruleshield start [--port 8337] [--daemon]
+ruleshield start [--port PORT] [--daemon]
 ruleshield stop
 ruleshield stats
 ruleshield rules
@@ -42,7 +42,8 @@ python -m ruleshield.cli shadow-reset --yes</pre>
 
 <h2 class="docs-h2">REST API</h2>
 <p class="docs-p">
-	Default base URL is <code class="docs-code">http://127.0.0.1:8337</code>.
+	Base URL is your configured gateway, e.g.
+	<code class="docs-code">http://127.0.0.1:&lt;PORT&gt;</code>.
 </p>
 
 <h3 class="docs-h3">Health and Metrics</h3>
@@ -58,7 +59,7 @@ python -m ruleshield.cli shadow-reset --yes</pre>
 	</tbody>
 </table>
 
-<pre class="docs-pre">curl -s http://127.0.0.1:8337/api/stats
+<pre class="docs-pre">curl -s http://127.0.0.1:&lt;PORT&gt;/api/stats
 
 &#123;
   "total_requests": 417,
@@ -133,7 +134,7 @@ python -m ruleshield.cli shadow-reset --yes</pre>
 	<tbody>
 		<tr><td><code class="docs-code">provider_url</code></td><td><code class="docs-code">https://api.openai.com</code></td><td>Upstream provider base URL</td></tr>
 		<tr><td><code class="docs-code">api_key</code></td><td><code class="docs-code">""</code></td><td>Provider API key (do not commit)</td></tr>
-		<tr><td><code class="docs-code">port</code></td><td><code class="docs-code">8337</code></td><td>Proxy listen port</td></tr>
+		<tr><td><code class="docs-code">port</code></td><td><code class="docs-code">8347</code></td><td>Proxy listen port (change as needed)</td></tr>
 		<tr><td><code class="docs-code">cache_enabled</code></td><td><code class="docs-code">true</code></td><td>Enable semantic cache layer</td></tr>
 		<tr><td><code class="docs-code">rules_enabled</code></td><td><code class="docs-code">true</code></td><td>Enable rule engine layer</td></tr>
 		<tr><td><code class="docs-code">shadow_mode</code></td><td><code class="docs-code">false</code></td><td>Enable shadow comparisons and feedback logging</td></tr>

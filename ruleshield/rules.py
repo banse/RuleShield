@@ -3,7 +3,7 @@
 JSON-based pattern matching that intercepts LLM requests and returns
 pre-computed responses, saving API costs for predictable prompts.
 
-Enhanced with SAP enterprise patterns:
+Enhanced with weighted matching patterns:
   - Weighted keyword + regex scoring (not just boolean matching).
   - Confidence levels (CONFIRMED/LIKELY/POSSIBLE) instead of simple float.
   - Dual-trigger matching: keyword AND context conditions scored together.
@@ -25,7 +25,7 @@ from typing import Any
 
 
 # ---------------------------------------------------------------------------
-# SAP-inspired scoring weights
+# Weighted scoring weights
 # ---------------------------------------------------------------------------
 # These weights determine how different pattern types contribute to the
 # overall match score.  Regex patterns are weighted higher because they
@@ -402,7 +402,7 @@ class RuleEngine:
     ) -> dict[str, Any] | None:
         """Match *prompt_text* (and optional *messages*) against loaded rules.
 
-        Uses weighted scoring (SAP enterprise pattern) to rank matches:
+        Uses weighted scoring to rank matches:
           - Each pattern type contributes a different weight to the score.
           - A minimum score threshold prevents weak single-keyword matches.
           - Within the same priority tier, the highest-scoring rule wins.
@@ -474,7 +474,7 @@ class RuleEngine:
 
             score, matched_kw, matched_pat = self._score_rule(rule, last_user_msg)
 
-            # Conditions only add bonus if a real pattern matched (SAP dual-trigger).
+            # Conditions only add bonus if a real pattern matched.
             # Without this guard, conditions alone (max_length etc.) would cause
             # false positives on any short prompt.
             if score > 0:
@@ -778,7 +778,7 @@ class RuleEngine:
         # Merge any persisted runtime state (hit counts, confidence, enabled).
         self._apply_persisted_state()
 
-    # ---- scoring (SAP enterprise pattern) ----
+    # ---- scoring ----
 
     def _score_rule(
         self,
@@ -787,8 +787,8 @@ class RuleEngine:
     ) -> tuple[float, list[str], list[str]]:
         """Score a rule match with weighted keywords + patterns.
 
-        Inspired by SAP enterprise rule engines that assign different weights
-        to different match types instead of treating all pattern hits equally.
+        Different pattern types carry different weights instead of treating
+        all pattern hits equally.
 
         Returns:
             (score, matched_keywords, matched_patterns) where
@@ -836,8 +836,8 @@ class RuleEngine:
     ) -> str:
         """Compute a discrete confidence level from the numeric score.
 
-        SAP enterprise pattern: instead of exposing raw floats to callers,
-        bucket the score into human-readable tiers that drive downstream
+        Instead of exposing raw floats to callers, bucket the score into
+        human-readable tiers that drive downstream
         behaviour (e.g. auto-respond for CONFIRMED, shadow-verify for
         LIKELY, log-only for POSSIBLE).
 

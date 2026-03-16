@@ -1,0 +1,12 @@
+GENERATED VOICE CHECKLIST
+
+1. Pick one calm male voice
+2. Paste the voice prompt
+3. Render the 4 main blocks separately
+4. Listen for over-polished delivery
+5. Re-render only weak blocks
+6. Keep pauses natural
+7. Record screen after audio is ready
+8. Cut the video to the audio
+9. Add opening and closing cards
+10. Keep the final video under 90 seconds

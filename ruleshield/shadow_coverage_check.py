@@ -301,7 +301,7 @@ def run_shadow_coverage_check(
     output_dir.mkdir(parents=True, exist_ok=True)
     scenarios = [_load_scenario_from_path(path) for path in scenario_paths]
 
-    bearer = _extract_runtime_bearer(runtime_home)
+    bearer = _extract_runtime_bearer(runtime_home, model=model)
     with httpx.Client() as client:
         health = client.get(f"{proxy_url.rstrip('/')}/health", timeout=15.0)
         health.raise_for_status()

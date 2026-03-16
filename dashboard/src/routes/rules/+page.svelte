@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import { getGatewayBaseClient } from '$lib/gateway';
 
 	let { data } = $props();
 
@@ -26,6 +27,7 @@
 	// Sort state
 	let sortKey = $state<keyof Rule>('hits');
 	let sortDir = $state<'asc' | 'desc'>('desc');
+	let apiBase = $state('');
 
 	// Sync from server data
 	$effect(() => {
@@ -89,7 +91,7 @@
 		active = rules.filter((r) => r.enabled).length;
 
 		try {
-			const res = await fetch(`http://127.0.0.1:8337/api/rules/${ruleId}/toggle`, {
+			const res = await fetch(`${apiBase}/api/rules/${ruleId}/toggle`, {
 				method: 'POST'
 			});
 
@@ -139,6 +141,7 @@
 
 	// Auto-refresh every 5 seconds
 	onMount(() => {
+		apiBase = getGatewayBaseClient();
 		const interval = setInterval(async () => {
 			await invalidateAll();
 		}, 5000);

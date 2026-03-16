@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import { getGatewayBaseClient } from '$lib/gateway';
 
 	let { data } = $props();
 	let refreshing = $state(false);
@@ -53,8 +54,10 @@
 	let detailLoading = $state(false);
 	let toast = $state<{ message: string; type: 'success' | 'error' } | null>(null);
 	let toastTimeout: ReturnType<typeof setTimeout> | null = null;
+	let apiBase = $state('');
 
 	onMount(() => {
+		apiBase = getGatewayBaseClient();
 		const interval = setInterval(async () => {
 			refreshing = true;
 			await invalidateAll();
@@ -123,7 +126,7 @@
 		selectedProfileId = profileId;
 		detailLoading = true;
 		try {
-			const res = await fetch(`http://127.0.0.1:8337/api/cron-profiles/${profileId}`);
+			const res = await fetch(`${apiBase}/api/cron-profiles/${profileId}`);
 			if (!res.ok) {
 				selectedProfile = null;
 				selectedProfileHistory = [];
@@ -156,7 +159,7 @@
 
 	async function activateProfile(profileId: string, force = false) {
 		try {
-			const res = await fetch(`http://127.0.0.1:8337/api/cron-profiles/${profileId}/activate`, {
+			const res = await fetch(`${apiBase}/api/cron-profiles/${profileId}/activate`, {
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({ force })
@@ -189,7 +192,7 @@
 		}
 
 		try {
-			const res = await fetch(`http://127.0.0.1:8337/api/cron-profiles/${profileId}/execute`, {
+			const res = await fetch(`${apiBase}/api/cron-profiles/${profileId}/execute`, {
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({ payload_text: payloadText })
@@ -217,7 +220,7 @@
 
 	async function archiveProfile(profileId: string) {
 		try {
-			const res = await fetch(`http://127.0.0.1:8337/api/cron-profiles/${profileId}/archive`, {
+			const res = await fetch(`${apiBase}/api/cron-profiles/${profileId}/archive`, {
 				method: 'POST'
 			});
 			const payload = await res.json();
@@ -236,7 +239,7 @@
 
 	async function restoreProfile(profileId: string) {
 		try {
-			const res = await fetch(`http://127.0.0.1:8337/api/cron-profiles/${profileId}/restore`, {
+			const res = await fetch(`${apiBase}/api/cron-profiles/${profileId}/restore`, {
 				method: 'POST'
 			});
 			const payload = await res.json();
@@ -254,7 +257,7 @@
 
 	async function duplicateProfile(profileId: string) {
 		try {
-			const res = await fetch(`http://127.0.0.1:8337/api/cron-profiles/${profileId}/duplicate`, {
+			const res = await fetch(`${apiBase}/api/cron-profiles/${profileId}/duplicate`, {
 				method: 'POST'
 			});
 			const payload = await res.json();
@@ -274,7 +277,7 @@
 
 	async function deleteProfile(profileId: string) {
 		try {
-			const res = await fetch(`http://127.0.0.1:8337/api/cron-profiles/${profileId}`, {
+			const res = await fetch(`${apiBase}/api/cron-profiles/${profileId}`, {
 				method: 'DELETE'
 			});
 			const payload = await res.json();
@@ -302,7 +305,7 @@
 
 	async function saveDraftEdits(profileId: string) {
 		try {
-			const res = await fetch(`http://127.0.0.1:8337/api/cron-profiles/${profileId}/update`, {
+			const res = await fetch(`${apiBase}/api/cron-profiles/${profileId}/update`, {
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({
@@ -332,7 +335,7 @@
 		}
 
 		try {
-			const res = await fetch(`http://127.0.0.1:8337/api/cron-profiles/${profileId}/shadow-run`, {
+			const res = await fetch(`${apiBase}/api/cron-profiles/${profileId}/shadow-run`, {
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({
@@ -529,7 +532,7 @@
 				</a>
 				<div class="rounded-lg border border-border bg-surface px-3 py-2 text-xs text-text-secondary">
 					<span class:animate-pulse={connected && refreshing} class="mr-2 inline-block h-2 w-2 rounded-full bg-accent"></span>
-					{connected ? `Live on :8337` : 'Disconnected'}
+					{connected ? 'Live Gateway' : 'Disconnected'}
 				</div>
 			</div>
 		</header>

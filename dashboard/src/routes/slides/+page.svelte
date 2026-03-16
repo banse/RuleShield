@@ -226,7 +226,7 @@
 							<span class="term-output rich-green">&#10003; Detected Hermes Agent config</span>
 						</div>
 						<div class="terminal-line">
-							<span class="term-output rich-green">&#10003; Patched base_url &rarr; localhost:8337</span>
+							<span class="term-output rich-green">&#10003; Patched base_url &rarr; localhost:&lt;PORT&gt;</span>
 						</div>
 						<div class="terminal-line">
 							<span class="term-output rich-green">&#10003; Loaded 75 Hermes-specific rules</span>
@@ -235,7 +235,7 @@
 							<span class="term-output rich-green">&#10003; Cache initialized (semantic + exact)</span>
 						</div>
 						<div class="terminal-line">
-							<span class="term-output rich-purple">&#9733; RuleShield proxy running on :8337</span>
+							<span class="term-output rich-purple">&#9733; RuleShield proxy running on :PORT</span>
 						</div>
 					</div>
 				</div>
@@ -489,7 +489,7 @@
 						</div>
 
 						<div class="arch-proxy">
-							<div class="arch-proxy-title">RuleShield Proxy <span class="arch-port">:8337</span></div>
+							<div class="arch-proxy-title">RuleShield Proxy <span class="arch-port">:PORT</span></div>
 							<div class="arch-pipeline">
 								<span class="pipe-step">Cache</span>
 								<span class="pipe-arrow">&rarr;</span>
@@ -536,8 +536,8 @@
 					<code>ruleshield init --hermes</code>
 				</div>
 
-				<a href="https://github.com/banse/ruleshield-hermes" class="cta-link" target="_blank" rel="noopener">
-					github.com/banse/ruleshield-hermes
+				<a href="https://github.com/banse/RuleShield" class="cta-link" target="_blank" rel="noopener">
+					github.com/banse/RuleShield
 				</a>
 
 				<div class="cta-brand">

@@ -18,7 +18,7 @@ Usage:
 
 import os
 
-RULESHIELD_PROXY_URL = os.getenv("RULESHIELD_PROXY_URL", "http://127.0.0.1:8337/v1")
+RULESHIELD_PROXY_URL = os.getenv("RULESHIELD_PROXY_URL", "http://127.0.0.1:8347/v1")
 
 
 def OpenAI(**kwargs):
@@ -28,7 +28,7 @@ def OpenAI(**kwargs):
     All other arguments are passed through to the real OpenAI client.
 
     Environment variables:
-        RULESHIELD_PROXY_URL: Override proxy URL (default: http://127.0.0.1:8337/v1)
+        RULESHIELD_PROXY_URL: Override proxy URL (default: http://127.0.0.1:8347/v1)
         OPENAI_API_KEY: Your OpenAI API key (passed through to proxy)
     """
     try:

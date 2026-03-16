@@ -1,9 +1,36 @@
 # Shared helpers for RuleShield demo scripts
 # Source this file, don't execute it directly
 
+HELPERS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+RULESHIELD_ROOT="${RULESHIELD_ROOT:-$(cd "$HELPERS_DIR/.." && pwd)}"
+
+ruleshield_python_bin() {
+    local candidate="${PYTHON_BIN:-$RULESHIELD_ROOT/.venv/bin/python}"
+    if [[ -x "$candidate" ]]; then
+        printf '%s\n' "$candidate"
+        return
+    fi
+    command -v python3
+}
+
+ruleshield_config_port() {
+    local python_bin
+    python_bin="$(ruleshield_python_bin)"
+    PYTHONPATH="$RULESHIELD_ROOT" "$python_bin" - <<'PY'
+from ruleshield.config import load_settings
+print(load_settings().port)
+PY
+}
+
+ruleshield_default_proxy_url() {
+    local host="${1:-127.0.0.1}"
+    local port="${2:-$(ruleshield_config_port 2>/dev/null || printf '8347')}"
+    printf 'http://%s:%s\n' "$host" "$port"
+}
+
 AUTH="Authorization: Bearer ${RULESHIELD_TEST_KEY:-sk-test}"
-URL="http://localhost:8337/v1/chat/completions"
-MODEL="${RULESHIELD_TEST_MODEL:-claude-sonnet-4-6}"
+PROXY_URL="${PROXY_URL:-$(ruleshield_default_proxy_url)}"
+URL="${URL:-${PROXY_URL%/}/v1/chat/completions}"
 
 GREEN=$'\033[32m'
 YELLOW=$'\033[33m'
@@ -23,6 +50,7 @@ send() {
     local msg="$1"
     local expected="$2"
     local max_tokens="${3:-30}"
+    local model="${RULESHIELD_TEST_MODEL:-claude-sonnet-4-6}"
 
     TOTAL=$((TOTAL + 1))
 
@@ -35,7 +63,7 @@ send() {
 
     RESULT=$(curl -s --max-time 30 "$URL" \
         -H "$AUTH" -H "Content-Type: application/json" \
-        -d "{\"model\":\"$MODEL\",\"messages\":[{\"role\":\"user\",\"content\":$json_msg}],\"max_tokens\":$max_tokens}" 2>/dev/null)
+        -d "{\"model\":\"$model\",\"messages\":[{\"role\":\"user\",\"content\":$json_msg}],\"max_tokens\":$max_tokens}" 2>/dev/null)
 
     MODEL_RESP=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('model','?'))" 2>/dev/null)
 

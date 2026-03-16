@@ -84,7 +84,7 @@
 		{ label: 'Features', id: 'features' },
 		{ label: 'Pricing', id: 'pricing' },
 		{ label: 'Docs', href: '#' },
-		{ label: 'GitHub', href: 'https://github.com/ruleshield' }
+		{ label: 'GitHub', href: 'https://github.com/banse/RuleShield' }
 	];
 </script>
 
@@ -309,7 +309,7 @@ client = OpenAI()
 						title: 'Rule Engine',
 						cost: '$0',
 						color: 'primary',
-						desc: '75 auto-learned decision rules handle patterns with SAP-grade accuracy scoring.',
+						desc: '75 auto-learned decision rules handle common prompt patterns with weighted scoring.',
 						stat: '97%',
 						statLabel: 'Rule Accuracy',
 						icon: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 5v5l3 3"/></svg>`
@@ -770,11 +770,11 @@ client = OpenAI()
 				</div>
 
 				<div class="flex flex-wrap items-center justify-center gap-6 text-sm text-text-muted">
-					<a href="https://github.com/ruleshield" class="hover:text-text-primary transition-colors">GitHub</a>
-					<a href="#" class="hover:text-text-primary transition-colors">Docs</a>
+					<a href="https://github.com/banse/RuleShield" class="hover:text-text-primary transition-colors">GitHub</a>
+					<a href="/docs" class="hover:text-text-primary transition-colors">Docs</a>
 					<button onclick={() => scrollTo('pricing')} class="hover:text-text-primary transition-colors cursor-pointer">Pricing</button>
-					<a href="#" class="hover:text-text-primary transition-colors">Privacy</a>
-					<a href="#" class="hover:text-text-primary transition-colors">Terms</a>
+					<a href="/docs" class="hover:text-text-primary transition-colors">Privacy</a>
+					<a href="/docs" class="hover:text-text-primary transition-colors">Terms</a>
 				</div>
 
 				<p class="text-xs text-text-muted text-center md:text-right">
