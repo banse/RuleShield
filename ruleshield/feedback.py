@@ -612,11 +612,14 @@ class RuleFeedback:
         if self._db is None:
             await self.init()
 
+        _VALID_COMPONENT_COLS = frozenset({"classification_correct", "response_helpful", "confidence_appropriate"})
         components = ("classification_correct", "response_helpful", "confidence_appropriate")
         result: dict[str, dict[str, float]] = {}
 
         try:
             for col in components:
+                if col not in _VALID_COMPONENT_COLS:
+                    continue  # skip invalid column names
                 async with self._db.execute(
                     f"""
                     SELECT

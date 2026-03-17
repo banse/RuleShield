@@ -54,19 +54,46 @@ function render(summary) {
     const errorText = hasRun && status === "failed" ? String(lastRun.error || "") : "";
     const logPath = hasRun ? String(lastRun.log_path || "") : "";
     const href = logHref(logPath);
-    const errorCell =
-      errorText && href
-        ? `<a class="error-link" href="${href}" target="_blank" rel="noopener noreferrer">${errorText}</a>`
-        : (errorText || "-");
+    const tdName = document.createElement("td");
+    tdName.textContent = test.name || test.id || "-";
+    tr.appendChild(tdName);
 
-    tr.innerHTML = `
-      <td>${test.name || test.id || "-"}</td>
-      <td><span class="path">${test.script_path || "-"}</span></td>
-      <td>${test.group || "-"}</td>
-      <td>${hasRun ? formatDate(lastRun.ended_at || lastRun.started_at) : "-"}</td>
-      <td><span class="status ${statusClass(status, hasRun)}">${statusLabel(status, hasRun)}</span></td>
-      <td class="error">${errorCell}</td>
-    `;
+    const tdPath = document.createElement("td");
+    const spanPath = document.createElement("span");
+    spanPath.className = "path";
+    spanPath.textContent = test.script_path || "-";
+    tdPath.appendChild(spanPath);
+    tr.appendChild(tdPath);
+
+    const tdGroup = document.createElement("td");
+    tdGroup.textContent = test.group || "-";
+    tr.appendChild(tdGroup);
+
+    const tdDate = document.createElement("td");
+    tdDate.textContent = hasRun ? formatDate(lastRun.ended_at || lastRun.started_at) : "-";
+    tr.appendChild(tdDate);
+
+    const tdStatus = document.createElement("td");
+    const spanStatus = document.createElement("span");
+    spanStatus.className = "status " + statusClass(status, hasRun);
+    spanStatus.textContent = statusLabel(status, hasRun);
+    tdStatus.appendChild(spanStatus);
+    tr.appendChild(tdStatus);
+
+    const tdError = document.createElement("td");
+    tdError.className = "error";
+    if (errorText && href) {
+      const a = document.createElement("a");
+      a.className = "error-link";
+      a.href = href;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.textContent = errorText;
+      tdError.appendChild(a);
+    } else {
+      tdError.textContent = errorText || "-";
+    }
+    tr.appendChild(tdError);
     rows.appendChild(tr);
   }
 
@@ -87,24 +114,49 @@ function renderStoryLogs(summary) {
     card.className = "log-card";
     const stamp = formatDate(item.ended_at || item.started_at);
     const status = String(item.status || "unknown");
-    const statusBadge = `<span class="status ${statusClass(status, true)}">${statusLabel(status, true)}</span>`;
-    const errorLine = status === "failed" && item.error ? `\nerror: ${item.error}` : "";
+    const errorLine = status === "failed" && item.error ? "\nerror: " + item.error : "";
     const excerpt = String(item.log_excerpt || "").trim() || "[no log excerpt]";
 
     const logHrefValue = logHref(item.log_path || "");
-    const logPathHtml = logHrefValue
-      ? `<a class="log-link" href="${logHrefValue}" target="_blank" rel="noopener noreferrer">${item.log_path || "-"}</a>`
-      : `${item.log_path || "-"}`;
 
-    card.innerHTML = `
-      <div class="log-head">
-        <div class="log-title">${item.name || item.case_id || "-"}</div>
-        <div>${statusBadge}</div>
-      </div>
-      <div class="log-meta">run: ${item.run_id || "-"} | suite: ${item.suite_id || "-"} | at: ${stamp}</div>
-      <div class="log-path">${logPathHtml}</div>
-      <pre class="log-body">${excerpt}${errorLine}</pre>
-    `;
+    const logHead = document.createElement("div");
+    logHead.className = "log-head";
+    const logTitle = document.createElement("div");
+    logTitle.className = "log-title";
+    logTitle.textContent = item.name || item.case_id || "-";
+    logHead.appendChild(logTitle);
+    const badgeWrapper = document.createElement("div");
+    const badgeSpan = document.createElement("span");
+    badgeSpan.className = "status " + statusClass(status, true);
+    badgeSpan.textContent = statusLabel(status, true);
+    badgeWrapper.appendChild(badgeSpan);
+    logHead.appendChild(badgeWrapper);
+    card.appendChild(logHead);
+
+    const logMeta = document.createElement("div");
+    logMeta.className = "log-meta";
+    logMeta.textContent = "run: " + (item.run_id || "-") + " | suite: " + (item.suite_id || "-") + " | at: " + stamp;
+    card.appendChild(logMeta);
+
+    const logPathDiv = document.createElement("div");
+    logPathDiv.className = "log-path";
+    if (logHrefValue) {
+      const logLink = document.createElement("a");
+      logLink.className = "log-link";
+      logLink.href = logHrefValue;
+      logLink.target = "_blank";
+      logLink.rel = "noopener noreferrer";
+      logLink.textContent = item.log_path || "-";
+      logPathDiv.appendChild(logLink);
+    } else {
+      logPathDiv.textContent = item.log_path || "-";
+    }
+    card.appendChild(logPathDiv);
+
+    const logBody = document.createElement("pre");
+    logBody.className = "log-body";
+    logBody.textContent = excerpt + errorLine;
+    card.appendChild(logBody);
     feed.appendChild(card);
   }
 }
@@ -135,5 +187,12 @@ async function main() {
 
 main().catch((err) => {
   const rows = document.getElementById("rows");
-  rows.innerHTML = `<tr><td colspan="6" class="error">Failed to load summary: ${String(err)}</td></tr>`;
+  rows.textContent = "";
+  const tr = document.createElement("tr");
+  const td = document.createElement("td");
+  td.setAttribute("colspan", "6");
+  td.className = "error";
+  td.textContent = "Failed to load summary: " + String(err);
+  tr.appendChild(td);
+  rows.appendChild(tr);
 });
