@@ -116,11 +116,39 @@ class CacheManager:
 
         self._db = await aiosqlite.connect(self.db_path)
         self._db.row_factory = aiosqlite.Row
+        # WAL mode: 5-10x faster writes, concurrent reads during writes
+        await self._db.execute("PRAGMA journal_mode=WAL")
+        await self._db.execute("PRAGMA synchronous=NORMAL")
         await self._db.execute(_SCHEMA_CACHE)
         await self._db.execute(_SCHEMA_SHADOW_LOG)
         await self._db.execute(_SCHEMA_REQUEST_LOG)
+        # Indexes for faster queries and eviction
+        await self._db.execute("CREATE INDEX IF NOT EXISTS idx_cache_created ON cache(created_at)")
+        await self._db.execute("CREATE INDEX IF NOT EXISTS idx_rlog_created ON request_log(created_at)")
+        await self._db.execute("CREATE INDEX IF NOT EXISTS idx_rlog_resolution ON request_log(resolution_type)")
         await self._db.commit()
-        logger.info("Cache database initialised at %s", self.db_path)
+        logger.info("Cache database initialised at %s (WAL mode)", self.db_path)
+
+    async def evict(self, max_entries: int = 10000, max_age_hours: int = 168) -> None:
+        """Remove old entries to prevent unbounded DB growth."""
+        if self._db is None:
+            return
+        try:
+            await self._db.execute(
+                "DELETE FROM cache WHERE created_at < datetime('now', ?)",
+                (f'-{max_age_hours} hours',),
+            )
+            await self._db.execute(
+                "DELETE FROM cache WHERE id NOT IN (SELECT id FROM cache ORDER BY created_at DESC LIMIT ?)",
+                (max_entries,),
+            )
+            await self._db.execute(
+                "DELETE FROM request_log WHERE id NOT IN (SELECT id FROM request_log ORDER BY id DESC LIMIT 50000)"
+            )
+            await self._db.commit()
+            logger.info("Cache eviction complete")
+        except Exception as exc:
+            logger.warning("Cache eviction failed: %s", exc)
 
     async def close(self) -> None:
         """Close the database connection."""

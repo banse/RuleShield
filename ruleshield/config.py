@@ -48,6 +48,9 @@ class Settings:
     prompt_trimming_enabled: bool = False
     slack_webhook: str = ""
     max_retries: int = 3
+    admin_key: str = ""  # API key for management endpoints (empty = open access)
+    rate_limit_rpm: int = 120  # requests per minute per IP
+    max_body_size_mb: int = 10  # max request body in MB
 
     # ---- helpers ----------------------------------------------------------
 
@@ -70,6 +73,9 @@ class Settings:
             "prompt_trimming_enabled": self.prompt_trimming_enabled,
             "slack_webhook": self.slack_webhook,
             "max_retries": self.max_retries,
+            "admin_key": self.admin_key,
+            "rate_limit_rpm": self.rate_limit_rpm,
+            "max_body_size_mb": self.max_body_size_mb,
         }
 
 
@@ -110,6 +116,12 @@ def _env_overrides(settings: Settings) -> Settings:
         settings.slack_webhook = val
     if val := os.getenv("RULESHIELD_MAX_RETRIES"):
         settings.max_retries = int(val)
+    if val := os.getenv("RULESHIELD_ADMIN_KEY"):
+        settings.admin_key = val
+    if val := os.getenv("RULESHIELD_RATE_LIMIT_RPM"):
+        settings.rate_limit_rpm = int(val)
+    if val := os.getenv("RULESHIELD_MAX_BODY_SIZE_MB"):
+        settings.max_body_size_mb = int(val)
     return settings
 
 

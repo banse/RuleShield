@@ -30,7 +30,7 @@ from typing import Any
 
 import httpx
 import yaml
-from fastapi import FastAPI, Query, Request, Response
+from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from starlette.background import BackgroundTask
@@ -628,6 +628,8 @@ async def lifespan(app: FastAPI):
     # Shutdown.
     if feedback_manager is not None:
         await feedback_manager.close()
+    if cache_manager is not None:
+        await cache_manager.close()
     if http_client:
         await http_client.aclose()
     logger.info("RuleShield Hermes proxy stopped.")
@@ -663,6 +665,51 @@ app.add_middleware(
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
+
+# ---------------------------------------------------------------------------
+# Security middleware
+# ---------------------------------------------------------------------------
+
+class SimpleRateLimiter:
+    """In-memory per-IP rate limiter."""
+    def __init__(self, rpm: int = 120):
+        self.rpm = rpm
+        self._buckets: dict[str, list[float]] = {}
+    def check(self, ip: str) -> bool:
+        now = time.monotonic()
+        bucket = self._buckets.setdefault(ip, [])
+        bucket[:] = [t for t in bucket if now - t < 60]
+        if len(bucket) >= self.rpm:
+            return False
+        bucket.append(now)
+        return True
+
+_rate_limiter = SimpleRateLimiter(settings.rate_limit_rpm if hasattr(settings, 'rate_limit_rpm') else 120)
+
+async def require_admin_key(authorization: str = Header(None, alias="X-RuleShield-Admin-Key")):
+    """Require admin key for management endpoints."""
+    if not settings.admin_key:
+        return
+    if not authorization or authorization != settings.admin_key:
+        raise HTTPException(status_code=401, detail="Invalid or missing admin key")
+
+@app.middleware("http")
+async def rate_limit_middleware(request: Request, call_next):
+    if request.url.path == "/health":
+        return await call_next(request)
+    ip = request.client.host if request.client else "unknown"
+    if not _rate_limiter.check(ip):
+        logger.warning("Rate limit exceeded for %s", ip)
+        return JSONResponse(status_code=429, content={"error": "Rate limit exceeded"})
+    return await call_next(request)
+
+@app.middleware("http")
+async def body_size_middleware(request: Request, call_next):
+    cl = request.headers.get("content-length")
+    max_bytes = getattr(settings, 'max_body_size_mb', 10) * 1024 * 1024
+    if cl and int(cl) > max_bytes:
+        return JSONResponse(status_code=413, content={"error": "Request body too large"})
+    return await call_next(request)
 
 # ---------------------------------------------------------------------------
 # Startup timestamp for uptime calculation
@@ -1838,7 +1885,8 @@ async def list_models(request: Request):
     headers = _forward_headers(request)
 
     try:
-        assert http_client is not None
+        if http_client is None:
+            return JSONResponse(status_code=503, content={"error": "Proxy not initialized"})
         resp = await http_client.get(upstream_url, headers=headers)
         return Response(
             content=resp.content,
@@ -1928,7 +1976,8 @@ async def proxy_codex_passthrough(request: Request, path: str = ""):
 
     logger.info("Codex passthrough %s %s -> %s (model=%s)", method, endpoint, upstream_url, model)
 
-    assert http_client is not None
+    if http_client is None:
+        return JSONResponse(status_code=503, content={"error": "Proxy not initialized"})
     try:
         headers["Content-Type"] = request.headers.get("content-type", "application/json")
 
@@ -2379,7 +2428,8 @@ async def proxy_passthrough(request: Request, path: str):
     upstream_url = f"{provider_url.rstrip('/')}{endpoint}"
     logger.info("Passthrough %s %s -> %s (model=%s)", method, endpoint, upstream_url, model)
 
-    assert http_client is not None
+    if http_client is None:
+        return JSONResponse(status_code=503, content={"error": "Proxy not initialized"})
     try:
         if method == "GET":
             resp = await http_client.get(upstream_url, headers=headers)
@@ -2820,7 +2870,8 @@ async def _forward_upstream(
     shadow_rule_hit: dict[str, Any] | None = None,
 ) -> Response:
     """Forward request and return the full JSON response."""
-    assert http_client is not None
+    if http_client is None:
+        return JSONResponse(status_code=503, content={"error": "Proxy not initialized"})
 
     try:
         resp = await _retry_request("POST", url, headers, body=body)
@@ -2927,7 +2978,9 @@ async def _stream_upstream(
         stream_headers["X-RuleShield-Shadow"] = shadow_rule_hit.get("rule_id", "")
 
     async def event_generator():
-        assert http_client is not None
+        if http_client is None:
+            yield f"data: {json.dumps({'error': 'Proxy not initialized'})}\n\n"
+            return
         collected_chunks: list[str] = []
         tokens_completion = 0
         tokens_prompt = 0
@@ -3592,6 +3645,16 @@ async def _record_metrics(
             "llm_calls": dashboard.llm_calls,
         }
         asyncio.create_task(slack_notifier.notify_savings_milestone(milestone_stats))
+
+    # --- Cache eviction check (every 1000 requests) ----------------------
+    if not hasattr(_record_metrics, '_evict_counter'):
+        _record_metrics._evict_counter = 0
+    _record_metrics._evict_counter += 1
+    if _record_metrics._evict_counter % 1000 == 0:
+        try:
+            await cache_manager.evict()
+        except Exception:
+            pass
 
     # --- Auto-promotion check (every 100 requests) -----------------------
     if not hasattr(_record_metrics, "_request_count"):
