@@ -43,6 +43,7 @@
 </p>
 
 <h3 class="docs-h3">Before</h3>
+<!-- nosec - documentation placeholder, not a real API key -->
 <pre class="docs-pre"><span class="comment"># ~/.hermes/config.yaml</span>
 model:
   base_url: <span class="string">https://api.openai.com/v1</span>
@@ -50,6 +51,7 @@ model:
   api_key: sk-...</pre>
 
 <h3 class="docs-h3">After</h3>
+<!-- nosec - documentation placeholder, not a real API key -->
 <pre class="docs-pre"><span class="comment"># ~/.hermes/config.yaml (patched by RuleShield)</span>
 model:
   base_url: <span class="string">http://127.0.0.1:8347/v1</span>
