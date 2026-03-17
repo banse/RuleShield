@@ -25,3 +25,12 @@ tests/status/data/runs/
 tests/status/data/tests/
 tests/status/data/summary.json
 tests/.local/
+ruleshield-hermes/
+.playwright-mcp/
+*.png
+*.jpg
+.DS_Store
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/

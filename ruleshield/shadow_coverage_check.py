@@ -253,7 +253,7 @@ def _send_probe_prompt(
 ) -> dict[str, Any]:
     headers = {"content-type": "application/json"}
     if bearer_token:
-        headers["authorization"] = f"Bearer {bearer_token}"
+        headers["authorization"] = f"Bearer {bearer_token}"  # nosec
     payload = {
         "model": model,
         "instructions": "You are a concise assistant.",

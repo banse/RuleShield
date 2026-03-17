@@ -47,14 +47,14 @@
 model:
   base_url: <span class="string">https://api.openai.com/v1</span>
   model_name: gpt-4o
-  api_key: sk-...</pre>
+  api_key: <!-- nosec - documentation placeholder -->sk-...</pre>
 
 <h3 class="docs-h3">After</h3>
 <pre class="docs-pre"><span class="comment"># ~/.hermes/config.yaml (patched by RuleShield)</span>
 model:
   base_url: <span class="string">http://127.0.0.1:8347/v1</span>
   model_name: gpt-4o
-  api_key: sk-...</pre>
+  api_key: <!-- nosec - documentation placeholder -->sk-...</pre>
 
 <p class="docs-p">
 	The original <code class="docs-code">base_url</code> is saved to

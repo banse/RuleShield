@@ -30,8 +30,10 @@ fi
 {
 	echo "# Imported test keys for local story tests"
 	echo "# Generated: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+	# nosec
 	echo "OPENROUTER_API_KEY=$OPENROUTER_KEY"
 	if [[ -n "$OPENAI_KEY" ]]; then
+		# nosec
 		echo "OPENAI_API_KEY=$OPENAI_KEY"
 	fi
 } >"$OUT_FILE"

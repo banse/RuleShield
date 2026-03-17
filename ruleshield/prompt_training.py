@@ -1162,6 +1162,7 @@ def _extract_runtime_bearer(runtime_home: Path, model: str | None = None) -> str
     # Runtime auth for training/monitor flows is sourced from Hermes .env.
     env_vars = _parse_dotenv(runtime_home / ".hermes" / ".env")
     prefers_openrouter = _is_openrouter_like_model(model or "")
+    # nosec - env var names, not secrets
     primary_key = "OPENROUTER_API_KEY" if prefers_openrouter else "OPENAI_API_KEY"
     secondary_key = "OPENAI_API_KEY" if prefers_openrouter else "OPENROUTER_API_KEY"
     for key in (primary_key, secondary_key):
