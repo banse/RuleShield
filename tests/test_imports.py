@@ -2219,3 +2219,22 @@ def test_api_shadow_returns_tune_examples():
     finally:
         proxy.cache_manager = original_cache_manager
         proxy.settings = original_settings
+
+
+def test_config_validation():
+    """Verify Settings default values match expected contract."""
+    from ruleshield.config import Settings
+
+    s = Settings()
+    assert s.admin_key == ""
+    assert s.rate_limit_rpm == 120
+    assert s.max_body_size_mb == 10
+
+
+def test_cache_evict_method_exists():
+    """Verify CacheManager exposes the evict lifecycle method."""
+    from ruleshield.cache import CacheManager
+
+    cm = CacheManager()
+    assert hasattr(cm, "evict")
+    assert callable(cm.evict)

@@ -7,6 +7,7 @@ Layer 2: Semantic similarity via sentence-transformers embeddings
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json
 import logging
@@ -188,6 +189,20 @@ class CacheManager:
             return None
         return self._embed_model.encode(text, normalize_embeddings=True)
 
+    async def _encode_async(self, text: str) -> np.ndarray | None:
+        """Run embedding computation in thread pool to avoid blocking event loop."""
+        if self._embed_model is None:
+            await self._load_embed_model_async()
+            if self._embed_model is None:
+                return None
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self._encode, text)
+
+    async def _load_embed_model_async(self) -> None:
+        """Load embedding model in background thread."""
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(None, self._load_embed_model)
+
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
@@ -285,7 +300,7 @@ class CacheManager:
             await self.init()
 
         embedding_blob: bytes | None = None
-        embedding = self._encode(prompt_text)
+        embedding = await self._encode_async(prompt_text)
         if embedding is not None:
             embedding_blob = embedding.astype(np.float32).tobytes()
 
@@ -675,7 +690,7 @@ class CacheManager:
 
     async def _semantic_lookup(self, prompt_text: str) -> dict[str, Any] | None:
         """Find the best semantic match among recent cached embeddings."""
-        query_embedding = self._encode(prompt_text)
+        query_embedding = await self._encode_async(prompt_text)
         if query_embedding is None:
             return None
 
