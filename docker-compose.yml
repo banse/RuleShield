@@ -6,7 +6,6 @@ services:
     ports:
       - "8337:8337"
     environment:
-      # nosec - shell variable reference, resolved at runtime
       - RULESHIELD_API_KEY=${LLM_API_KEY:-}
       - RULESHIELD_PROVIDER_URL=${PROVIDER_URL:-https://api.openai.com}
       - RULESHIELD_CACHE_ENABLED=true

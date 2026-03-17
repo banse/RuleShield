@@ -169,7 +169,6 @@ PY
 	openrouter_key="$(resolve_openrouter_key_for_home "$tmp_home")"
 
 	HOME="$tmp_home" PYTHONPATH="$RULESHIELD_ROOT" \
-	# nosec - shell variable references, not hardcoded secrets
 	OPENROUTER_API_KEY="$openrouter_key" RULESHIELD_OPENROUTER_API_KEY="$openrouter_key" \
 	"$python_bin" -m uvicorn ruleshield.proxy:app \
 		--host 127.0.0.1 \

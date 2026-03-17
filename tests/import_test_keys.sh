@@ -30,10 +30,9 @@ fi
 {
 	echo "# Imported test keys for local story tests"
 	echo "# Generated: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-	# nosec - shell variable reference, output file is chmod 600
 	echo "OPENROUTER_API_KEY=$OPENROUTER_KEY"
 	if [[ -n "$OPENAI_KEY" ]]; then
-		echo "OPENAI_API_KEY=$OPENAI_KEY"  # nosec - shell variable reference, output file is chmod 600
+		echo "OPENAI_API_KEY=$OPENAI_KEY"
 	fi
 } >"$OUT_FILE"
 

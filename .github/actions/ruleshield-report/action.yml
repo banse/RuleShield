@@ -7,7 +7,6 @@ branding:
   color: 'blue'
 
 inputs:
-  # nosec - GitHub Actions input parameter declaration, not a secret value
   api_key:
     description: 'LLM API key (e.g. OpenAI key) passed to the proxy'
     required: true
@@ -23,7 +22,6 @@ inputs:
     description: 'Python version to use'
     required: false
     default: '3.12'
-  # nosec - GitHub Actions input parameter declaration, not a secret value
   github_token:
     description: 'GitHub token for posting PR comments (defaults to GITHUB_TOKEN)'
     required: false

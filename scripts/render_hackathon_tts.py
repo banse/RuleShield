@@ -119,7 +119,7 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    api_key = __import__("os").environ.get("OPENAI_API_KEY", "").strip()  # nosec - reads API key from environment at runtime
+    api_key = __import__("os").environ.get("OPENAI_API_KEY", "").strip()
     if not api_key:
         raise SystemExit("OPENAI_API_KEY is required in your local shell.")
 

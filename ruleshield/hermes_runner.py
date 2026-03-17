@@ -48,7 +48,7 @@ class HermesRunner:
             raise RuntimeError("The 'openai' package is required for compact cron execution.") from exc
 
         client = openai.OpenAI(
-            api_key=self.settings.api_key or None,  # nosec - runtime config reference, not a hardcoded secret
+            api_key=self.settings.api_key or None,
             base_url=_normalize_base_url(self.settings.provider_url),
         )
         response = client.chat.completions.create(
