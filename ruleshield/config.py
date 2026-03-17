@@ -41,6 +41,7 @@ class Settings:
     shadow_test_confidence_floor: float = 0.0
     rules_dir: str = str(Path(__file__).resolve().parent.parent / "rules")
     log_level: str = "info"
+    log_json: bool = False
     router_enabled: bool = True
     router_config: dict = field(default_factory=dict)  # optional custom model mappings
     hermes_bridge_enabled: bool = False
@@ -66,6 +67,7 @@ class Settings:
             "shadow_test_confidence_floor": self.shadow_test_confidence_floor,
             "rules_dir": self.rules_dir,
             "log_level": self.log_level,
+            "log_json": self.log_json,
             "router_enabled": self.router_enabled,
             "router_config": self.router_config,
             "hermes_bridge_enabled": self.hermes_bridge_enabled,
@@ -104,6 +106,8 @@ def _env_overrides(settings: Settings) -> Settings:
         settings.rules_dir = val
     if val := os.getenv("RULESHIELD_LOG_LEVEL"):
         settings.log_level = val.lower()
+    if val := os.getenv("RULESHIELD_LOG_JSON"):
+        settings.log_json = val.lower() in ("1", "true", "yes")
     if val := os.getenv("RULESHIELD_ROUTER_ENABLED"):
         settings.router_enabled = val.lower() in ("1", "true", "yes")
     if val := os.getenv("RULESHIELD_HERMES_BRIDGE_ENABLED"):

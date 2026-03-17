@@ -37,6 +37,7 @@ from starlette.background import BackgroundTask
 
 from ruleshield.cache import CacheManager
 from ruleshield.config import CONFIG_PATH, RULESHIELD_DIR, Settings, load_settings
+from ruleshield.logging_config import setup_logging
 from ruleshield.cron_automation import build_automation_suggestion
 from ruleshield.cron_execution import get_profile_execution_history
 from ruleshield.cron_optimizer import (
@@ -588,10 +589,7 @@ async def lifespan(app: FastAPI):
 
     settings = load_settings()
 
-    logging.basicConfig(
-        level=getattr(logging, settings.log_level.upper(), logging.INFO),
-        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    )
+    setup_logging(level=settings.log_level, json_format=settings.log_json)
 
     logger.info(
         "RuleShield Hermes proxy starting -- provider=%s port=%s",
