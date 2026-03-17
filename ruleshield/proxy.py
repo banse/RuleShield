@@ -767,7 +767,7 @@ async def api_test_monitor_scripts():
         logger.error("Failed to fetch /api/test-monitor/scripts: %s", exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to fetch test scripts: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -784,7 +784,7 @@ async def api_test_monitor_model_profiles():
         logger.error("Failed to fetch /api/test-monitor/model-profiles: %s", exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to fetch model profiles: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -819,7 +819,7 @@ async def api_test_monitor_runs(limit: int = Query(default=40, ge=1, le=200)):
         logger.error("Failed to fetch /api/test-monitor/runs: %s", exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to fetch test runs: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -848,7 +848,7 @@ async def api_test_monitor_run_events(
         logger.error("Failed to fetch /api/test-monitor/runs/%s/events: %s", run_id, exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to fetch test run events: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1078,7 +1078,7 @@ async def api_test_monitor_run_ruleshield(run_id: str):
         logger.error("Failed to fetch /api/test-monitor/runs/%s/ruleshield: %s", run_id, exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to fetch run RuleShield stats: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1195,7 +1195,7 @@ async def api_test_monitor_start(request: Request):
         logger.error("Failed to start test monitor run: %s", exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to start test script: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1242,7 +1242,7 @@ async def api_test_monitor_stop(request: Request):
         logger.error("Failed to stop test monitor run: %s", exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to stop test script: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1307,7 +1307,7 @@ async def api_stats():
         logger.error("Failed to compute /api/stats: %s", exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to compute stats: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1336,7 +1336,7 @@ async def api_requests(limit: int = Query(default=20, ge=1, le=200)):
         logger.error("Failed to fetch /api/requests: %s", exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to fetch requests: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1388,7 +1388,7 @@ async def api_rules():
         logger.error("Failed to fetch /api/rules: %s", exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to fetch rules: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1406,7 +1406,7 @@ async def api_runtime_config():
         logger.error("Failed to fetch /api/runtime-config: %s", exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to fetch runtime config: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1458,7 +1458,7 @@ async def api_update_runtime_config(request: Request):
         logger.error("Failed to update /api/runtime-config: %s", exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to update runtime config: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1492,7 +1492,7 @@ async def api_toggle_rule(rule_id: str):
         logger.error("Failed to toggle rule %s: %s", rule_id, exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to toggle rule: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1576,7 +1576,7 @@ async def api_shadow(
         logger.error("Failed to fetch /api/shadow: %s", exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to fetch shadow stats: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1592,7 +1592,7 @@ async def api_rule_events(limit: int = Query(default=100, ge=1, le=500)):
         logger.error("Failed to fetch /api/rule-events: %s", exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to fetch rule events: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1609,7 +1609,7 @@ async def api_feedback(limit: int = Query(default=50, ge=1, le=300)):
         logger.error("Failed to fetch /api/feedback: %s", exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to fetch feedback data: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1630,7 +1630,7 @@ async def api_cron_profiles():
         logger.error("Failed to fetch /api/cron-profiles: %s", exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to fetch cron profiles: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1670,7 +1670,7 @@ async def api_cron_profile_detail(
         logger.error("Failed to fetch /api/cron-profiles/%s: %s", profile_id, exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to fetch cron profile: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1694,7 +1694,7 @@ async def api_activate_cron_profile(profile_id: str, request: Request):
         logger.error("Failed to activate cron profile %s: %s", profile_id, exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to activate cron profile: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1719,7 +1719,7 @@ async def api_execute_cron_profile(profile_id: str, request: Request):
         logger.error("Failed to execute cron profile %s: %s", profile_id, exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to execute cron profile: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1746,7 +1746,7 @@ async def api_run_cron_profile_shadow(profile_id: str, request: Request):
         logger.error("Failed to shadow-run cron profile %s: %s", profile_id, exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to shadow-run cron profile: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1773,7 +1773,7 @@ async def api_update_cron_profile(profile_id: str, request: Request):
         logger.error("Failed to update cron profile %s: %s", profile_id, exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to update cron profile: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1792,7 +1792,7 @@ async def api_archive_cron_profile(profile_id: str):
         logger.error("Failed to archive cron profile %s: %s", profile_id, exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to archive cron profile: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1811,7 +1811,7 @@ async def api_delete_cron_profile(profile_id: str):
         logger.error("Failed to delete cron profile %s: %s", profile_id, exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to delete cron profile: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1830,7 +1830,7 @@ async def api_restore_cron_profile(profile_id: str):
         logger.error("Failed to restore cron profile %s: %s", profile_id, exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to restore cron profile: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1849,7 +1849,7 @@ async def api_duplicate_cron_profile(profile_id: str):
         logger.error("Failed to duplicate cron profile %s: %s", profile_id, exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to duplicate cron profile: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1874,7 +1874,7 @@ async def api_cron_profile_automation(profile_id: str):
         logger.error("Failed to build automation suggestion for cron profile %s: %s", profile_id, exc)
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to build automation suggestion: {exc}"},
+            content={"error": "Internal server error"},
         )
 
 
@@ -1898,7 +1898,7 @@ async def list_models(request: Request):
         logger.error("Failed to list models from upstream: %s", exc)
         return JSONResponse(
             status_code=502,
-            content={"error": {"message": f"Upstream error: {exc}", "type": "proxy_error"}},
+            content={"error": {"message": "Upstream error", "type": "proxy_error"}},
         )
 
 
@@ -2381,7 +2381,7 @@ async def proxy_codex_passthrough(request: Request, path: str = ""):
         logger.error("Codex passthrough error for %s: %s", endpoint, exc)
         return JSONResponse(
             status_code=502,
-            content={"error": {"message": f"Upstream error: {exc}", "type": "proxy_error"}},
+            content={"error": {"message": "Upstream error", "type": "proxy_error"}},
         )
 
 
@@ -2503,7 +2503,7 @@ async def proxy_passthrough(request: Request, path: str):
         logger.error("Passthrough error for %s: %s", endpoint, exc)
         return JSONResponse(
             status_code=502,
-            content={"error": {"message": f"Upstream error: {exc}", "type": "proxy_error"}},
+            content={"error": {"message": "Upstream error", "type": "proxy_error"}},
         )
 
 
@@ -2879,7 +2879,7 @@ async def _forward_upstream(
         logger.error("Upstream request failed after retries: %s", exc)
         return JSONResponse(
             status_code=502,
-            content={"error": {"message": f"Upstream error: {exc}", "type": "proxy_error"}},
+            content={"error": {"message": "Upstream error", "type": "proxy_error"}},
         )
 
     latency_ms = (time.monotonic() - t_start) * 1000
@@ -3019,7 +3019,7 @@ async def _stream_upstream(
         except Exception as exc:
             logger.error("Streaming upstream error: %s", exc)
             error_payload = json.dumps(
-                {"error": {"message": f"Upstream stream error: {exc}", "type": "proxy_error"}}
+                {"error": {"message": "Upstream stream error", "type": "proxy_error"}}
             )
             yield f"data: {error_payload}\n\n"
             return
