@@ -1,0 +1,46 @@
+{
+  "rule_trigger": {
+    "description": "Prompts expected to match rules (instant, $0)",
+    "prompts": [
+      {"text": "hello", "expected_rule": "greeting_simple"},
+      {"text": "thanks", "expected_rule": "acknowledgment"},
+      {"text": "bye", "expected_rule": "goodbye"},
+      {"text": "yes", "expected_rule": "simple_confirmation"},
+      {"text": "ok", "expected_rule": "acknowledgment"},
+      {"text": "hallo", "expected_rule": "greeting_simple"},
+      {"text": "retry", "expected_rule": "error_retry_request"},
+      {"text": "skip", "expected_rule": "skip_next_request"},
+      {"text": "save it", "expected_rule": "save_commit_request"},
+      {"text": "undo that", "expected_rule": "undo_revert_request"}
+    ]
+  },
+  "passthrough": {
+    "description": "Prompts expected to NOT match any rule (forwarded to LLM)",
+    "prompts": [
+      {"text": "Explain the difference between TCP and UDP in networking"},
+      {"text": "What are the main features of Python 3.12?"},
+      {"text": "How does garbage collection work in JavaScript?"},
+      {"text": "Compare PostgreSQL and MySQL for a web application"},
+      {"text": "Describe the CAP theorem in distributed systems"}
+    ]
+  },
+  "temporal": {
+    "description": "Time-sensitive prompts that should never be cached",
+    "prompts": [
+      {"text": "What time is it in LA right now?"},
+      {"text": "What is the current weather in Berlin?"},
+      {"text": "How is the stock price of AAPL today?"},
+      {"text": "What are the latest news headlines?"}
+    ]
+  },
+  "edge_cases": {
+    "description": "Prompts near rule boundaries for regression testing",
+    "prompts": [
+      {"text": "hello world", "note": "slightly longer than simple greeting"},
+      {"text": "ok got it", "note": "multi-word acknowledgment"},
+      {"text": "save all code", "note": "was a false positive before min_score fix"},
+      {"text": "what time is it", "note": "temporal - should not cache"},
+      {"text": "who invented the internet", "note": "was false positive before fix"}
+    ]
+  }
+}

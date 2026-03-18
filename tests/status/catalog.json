@@ -13,6 +13,12 @@
       "group": "commit"
     },
     {
+      "id": "dashboard_build",
+      "name": "Dashboard build check",
+      "script_path": "dashboard/",
+      "group": "commit"
+    },
+    {
       "id": "story_install_init_restore",
       "name": "Story: install/init/restore",
       "script_path": "tests/stories/story_install_init_restore.sh",
