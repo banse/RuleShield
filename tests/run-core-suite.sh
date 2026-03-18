@@ -9,7 +9,7 @@ suite_init "core"
 trap 'suite_finish $?' EXIT
 
 echo "== Core Suite =="
-bash tests/run-commit-suite.sh
+SUITE_PARENT_RUN_ID="$RUN_ID" bash tests/run-commit-suite.sh
 
 echo "5) Story: health-check flow"
 suite_case "story_health_check_flow" "Story: health-check flow" "tests/stories/story_health_check_flow.sh" \

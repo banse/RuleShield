@@ -23,15 +23,19 @@ suite_case "smoke_pytests" "Python smoke/unit" "tests/test_imports.py + tests/te
     tests/test_imports.py tests/test_prompt_training.py \
     -k "not test_codex_responses_shadow_logs_and_feedback and not test_codex_responses_shadow_logs_tool_style_streams"
 
-echo "2) Story: install/init/restore"
+echo "2) Proxy integration tests"
+suite_case "proxy_integration" "Proxy integration tests" "tests/test_proxy_integration.py" \
+  env PYTHONPATH="$ROOT_DIR" "$PYTHON_BIN" -m pytest -q tests/test_proxy_integration.py
+
+echo "3) Story: install/init/restore"
 suite_case "story_install_init_restore" "Story: install/init/restore" "tests/stories/story_install_init_restore.sh" \
   bash tests/stories/story_install_init_restore.sh
 
-echo "3) Story: gateway honors config port"
+echo "4) Story: gateway honors config port"
 suite_case "story_gateway_honors_config_port" "Story: gateway honors config port" "tests/stories/story_gateway_honors_config_port.sh" \
   bash tests/stories/story_gateway_honors_config_port.sh
 
-echo "4) Story: rule-trigger flow"
+echo "5) Story: rule-trigger flow"
 suite_case "story_rule_trigger_flow" "Story: rule-trigger flow" "tests/stories/story_rule_trigger_flow.sh" \
   bash tests/stories/story_rule_trigger_flow.sh
 

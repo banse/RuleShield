@@ -197,6 +197,18 @@ suite_detect_login_method() {
 
 suite_init() {
 	SUITE_ID="$1"
+
+	# When called from a parent suite, reuse the parent's run context
+	# instead of creating a new overlapping session.
+	if [[ -n "${SUITE_PARENT_RUN_ID:-}" ]]; then
+		RUN_ID="$SUITE_PARENT_RUN_ID"
+		SUITE_STARTED_AT="$(suite_now_iso)"
+		SUITE_IS_CHILD=1
+		mkdir -p "$STATUS_LOGS_DIR"
+		return
+	fi
+
+	SUITE_IS_CHILD=0
 	SUITE_STARTED_AT="$(suite_now_iso)"
 	RUN_ID="$(python3 - <<'PY'
 from datetime import datetime, timezone
@@ -215,6 +227,10 @@ PY
 
 suite_finish() {
 	local exit_code="$1"
+	# Child suites must not finalize the parent's run session.
+	if [[ "${SUITE_IS_CHILD:-0}" == "1" ]]; then
+		return
+	fi
 	python3 "$STATUS_STORE" finalize-run \
 		--root "$ROOT_DIR" \
 		--run-id "$RUN_ID" \

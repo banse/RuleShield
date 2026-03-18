@@ -7,6 +7,12 @@
       "group": "commit"
     },
     {
+      "id": "proxy_integration",
+      "name": "Proxy integration tests",
+      "script_path": "tests/test_proxy_integration.py",
+      "group": "commit"
+    },
+    {
       "id": "story_install_init_restore",
       "name": "Story: install/init/restore",
       "script_path": "tests/stories/story_install_init_restore.sh",

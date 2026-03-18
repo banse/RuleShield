@@ -9,7 +9,7 @@ suite_init "full"
 trap 'suite_finish $?' EXIT
 
 echo "== Full Suite =="
-bash tests/run-core-suite.sh
+SUITE_PARENT_RUN_ID="$RUN_ID" bash tests/run-core-suite.sh
 
 echo "6) Story: health-check flow (OpenRouter StepFun)"
 suite_case "story_health_check_flow_openrouter_stepfun" "Story: health-check flow (OpenRouter StepFun)" "tests/stories/story_health_check_flow_openrouter_stepfun.sh" \
