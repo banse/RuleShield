@@ -23,4 +23,8 @@ echo "7) Story: feedback loop"
 suite_case "story_feedback_loop" "Story: feedback loop" "tests/stories/story_feedback_loop.sh" \
   bash tests/stories/story_feedback_loop.sh
 
+echo "8) Story: hermes passthrough"
+suite_case "story_hermes_passthrough" "Story: hermes passthrough" "tests/stories/story_hermes_passthrough.sh" \
+  bash tests/stories/story_hermes_passthrough.sh
+
 echo "run-core-suite: ok"

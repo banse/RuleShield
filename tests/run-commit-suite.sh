@@ -18,14 +18,14 @@ echo "== Commit Suite =="
 echo "1) Python smoke/unit"
 # Keep commit-gate deterministic: exclude two known flaky shadow-stream tests
 # that currently fail due runtime settings stubs in proxy codex stream paths.
-suite_case "smoke_pytests" "Python smoke/unit" "tests/test_imports.py + tests/test_prompt_training.py" \
+suite_case "smoke_pytests" "Python smoke/unit" "tests/smoke/test_imports.py + tests/smoke/test_prompt_training.py" \
   env PYTHONPATH="$ROOT_DIR" "$PYTHON_BIN" -m pytest -q \
-    tests/test_imports.py tests/test_prompt_training.py \
+    tests/smoke/test_imports.py tests/smoke/test_prompt_training.py \
     -k "not test_codex_responses_shadow_logs_and_feedback and not test_codex_responses_shadow_logs_tool_style_streams"
 
 echo "2) Proxy integration tests"
-suite_case "proxy_integration" "Proxy integration tests" "tests/test_proxy_integration.py" \
-  env PYTHONPATH="$ROOT_DIR" "$PYTHON_BIN" -m pytest -q tests/test_proxy_integration.py
+suite_case "proxy_integration" "Proxy integration tests" "tests/integration/test_proxy_integration.py" \
+  env PYTHONPATH="$ROOT_DIR" "$PYTHON_BIN" -m pytest -q tests/integration/test_proxy_integration.py
 
 echo "3) Story: install/init/restore"
 suite_case "story_install_init_restore" "Story: install/init/restore" "tests/stories/story_install_init_restore.sh" \

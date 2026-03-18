@@ -3,13 +3,13 @@
     {
       "id": "smoke_pytests",
       "name": "Python smoke/unit",
-      "script_path": "tests/test_imports.py + tests/test_prompt_training.py",
+      "script_path": "tests/smoke/test_imports.py + tests/smoke/test_prompt_training.py",
       "group": "commit"
     },
     {
       "id": "proxy_integration",
       "name": "Proxy integration tests",
-      "script_path": "tests/test_proxy_integration.py",
+      "script_path": "tests/integration/test_proxy_integration.py",
       "group": "commit"
     },
     {
@@ -52,6 +52,12 @@
       "id": "story_feedback_loop",
       "name": "Story: feedback loop",
       "script_path": "tests/stories/story_feedback_loop.sh",
+      "group": "core"
+    },
+    {
+      "id": "story_hermes_passthrough",
+      "name": "Story: hermes passthrough",
+      "script_path": "tests/stories/story_hermes_passthrough.sh",
       "group": "core"
     },
     {

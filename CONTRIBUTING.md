@@ -8,7 +8,12 @@ All contributions are welcome -- bug fixes, new rule packs, provider adapters, d
 
 - [Development Environment Setup](#development-environment-setup)
 - [Running the Proxy Locally](#running-the-proxy-locally)
-- [Running Tests](#running-tests)
+- [Testing Policy](#testing-policy)
+  - [Testing Requirements](#testing-requirements)
+  - [Running Tests Locally](#running-tests-locally)
+  - [Installing Git Hooks](#installing-git-hooks)
+  - [New Feature Policy](#new-feature-policy)
+  - [Story Matrix](#story-matrix)
 - [Adding a Rule Pack](#adding-a-rule-pack)
 - [Adding a Provider Adapter](#adding-a-provider-adapter)
 - [Contributing to the Dashboard](#contributing-to-the-dashboard)
@@ -72,51 +77,77 @@ ruleshield start
 
 The proxy runs on `http://localhost:8000` by default. Point your LLM client at this URL instead of the upstream provider to route requests through RuleShield.
 
-## Running Tests
+## Testing Policy
 
-Run the python test suite with pytest:
+RuleShield uses a three-tier test suite that gates commits, pushes, and releases. Every contributor is expected to run the appropriate suite before submitting code.
 
-```bash
-pytest
-```
+### Testing Requirements
 
-Run tests with verbose output to see individual test results:
+| Suite | Command | Gate | What It Covers |
+|-------|---------|------|----------------|
+| Commit | `bash tests/run-commit-suite.sh` | pre-commit | Smoke tests, proxy startup, core user stories |
+| Core | `bash tests/run-core-suite.sh` | pre-push | All user-story tests (Stories A-H) |
+| Full | `bash tests/run-full-suite.sh` | release/demo | Extended scenarios and edge cases |
 
-```bash
-pytest -v
-```
+- `run-commit-suite.sh` **must** pass before every commit.
+- `run-core-suite.sh` must pass before every push.
+- `run-full-suite.sh` is required for release candidates and demo prep.
 
-For product-level confidence, use the user-story suites:
-
-```bash
-# Fast gate (runs on every commit hook)
-bash tests/run-commit-suite.sh
-
-# Core gate (runs on every push hook)
-bash tests/run-core-suite.sh
-
-# Extended suite (release/demo hardening)
-bash tests/run-full-suite.sh
-```
-
-Install git hooks once per clone:
+You can also run the unit test suite directly with pytest:
 
 ```bash
-bash tests/install-git-hooks.sh
+pytest        # default run
+pytest -v     # verbose output with individual test results
 ```
 
-That configures:
-- `pre-commit` -> `tests/run-commit-suite.sh`
-- `pre-push` -> `tests/run-core-suite.sh`
+### Running Tests Locally
 
-### Coverage policy
+```bash
+bash tests/run-commit-suite.sh    # Fast gate (smoke + proxy + core stories)
+bash tests/run-core-suite.sh      # Full user stories
+bash tests/run-full-suite.sh      # Extended scenarios
+```
 
-New features must be covered by the user-story test suite.
+### Installing Git Hooks
 
-Rule:
-- If a feature changes an existing user workflow, update the existing story test.
-- If a feature introduces a new user workflow, add a new story test.
-- No user-story coverage means the feature is not ready to commit.
+Run this once after cloning to wire up automatic test gates:
+
+```bash
+bash tests/install-git-hooks.sh   # Sets up pre-commit + pre-push
+```
+
+This configures:
+- **pre-commit** runs `tests/run-commit-suite.sh`
+- **pre-push** runs `tests/run-core-suite.sh`
+
+If you need to bypass hooks in an emergency:
+
+```bash
+SKIP_HOOKS=1 git commit -m "..."  # Emergency bypass
+```
+
+### New Feature Policy
+
+- If a feature changes an existing user story, update that story's test.
+- If a feature creates a new user-visible workflow, add a new story test.
+- Rule: **"No coverage, no commit."**
+
+### Story Matrix
+
+The canonical test inventory lives in [`tests/story-matrix.md`](tests/story-matrix.md). Stories A through H cover the following workflows:
+
+| Story | Workflow |
+|-------|----------|
+| A | Install |
+| B | Gateway |
+| C | Passthrough |
+| D | Rules |
+| E | Health-check |
+| F | Monitor |
+| G | Feedback |
+| H | Rollback |
+
+When you add or modify a story test, update the matrix to keep it in sync.
 
 ## Adding a Rule Pack
 

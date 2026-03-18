@@ -81,7 +81,7 @@ jobs:
         run: python -c "from ruleshield import CacheManager, RuleEngine, SmartRouter"
 
       - name: Run tests
-        run: pytest tests/ -v
+        run: pytest tests/smoke tests/integration -v
 
   dashboard-build:
     name: Dashboard Build
