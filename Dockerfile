@@ -17,6 +17,10 @@ RUN pip install --no-cache-dir .
 # Create data directory
 RUN mkdir -p /data/rules && cp -r rules/* /data/rules/
 
+# Run as non-root user
+RUN useradd -m -r -s /bin/false appuser && chown -R appuser:appuser /app /data
+USER appuser
+
 # Expose proxy port
 EXPOSE 8337
 

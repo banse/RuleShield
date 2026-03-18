@@ -251,6 +251,64 @@ def restore_hermes_config() -> bool:
         return False
 
 
+# ---------------------------------------------------------------------------
+# Provider URL allowlist (SSRF prevention)
+# ---------------------------------------------------------------------------
+
+ALLOWED_PROVIDER_DOMAINS = {
+    "api.openai.com",
+    "api.anthropic.com",
+    "openrouter.ai",
+    "inference-api.nousresearch.com",
+    "chatgpt.com",
+    "generativelanguage.googleapis.com",
+    "api.deepseek.com",
+    "api.mistral.ai",
+    "api.groq.com",
+    "api.together.xyz",
+    "api.fireworks.ai",
+    "api.z.ai",
+    "api.moonshot.ai",
+    "api.minimax.io",
+    "api.minimaxi.com",
+    "localhost",
+    "127.0.0.1",
+    "0.0.0.0",
+}
+
+
+def validate_provider_url(url: str) -> bool:
+    """Check if provider URL domain is in the allowlist.
+
+    Also blocks RFC 1918 private ranges (except localhost)
+    and cloud metadata endpoints.
+    """
+    from urllib.parse import urlparse
+
+    parsed = urlparse(url)
+    hostname = parsed.hostname or ""
+
+    # Block cloud metadata
+    if hostname in ("169.254.169.254", "metadata.google.internal"):
+        return False
+
+    # Block private ranges (except localhost)
+    if hostname not in ("localhost", "127.0.0.1", "0.0.0.0"):
+        import ipaddress
+
+        try:
+            ip = ipaddress.ip_address(hostname)
+            if ip.is_private:
+                return False
+        except ValueError:
+            pass  # hostname is a domain, not IP
+
+    # Check allowlist
+    return hostname in ALLOWED_PROVIDER_DOMAINS or any(
+        hostname.endswith("." + domain) for domain in ALLOWED_PROVIDER_DOMAINS
+    )
+
+
 def _save_original_hermes_url(url: str) -> None:
     backup = RULESHIELD_DIR / "hermes_original_url.txt"
     RULESHIELD_DIR.mkdir(parents=True, exist_ok=True)

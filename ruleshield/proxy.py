@@ -591,6 +591,15 @@ async def lifespan(app: FastAPI):
 
     setup_logging(level=settings.log_level, json_format=settings.log_json)
 
+    from ruleshield.config import validate_provider_url
+
+    if not validate_provider_url(settings.provider_url):
+        logger.warning(
+            "Provider URL '%s' is not in the allowlist. "
+            "Add to ALLOWED_PROVIDER_DOMAINS if intentional.",
+            settings.provider_url,
+        )
+
     logger.info(
         "RuleShield Hermes proxy starting -- provider=%s port=%s",
         settings.provider_url,
@@ -708,6 +717,19 @@ async def body_size_middleware(request: Request, call_next):
     if cl and int(cl) > max_bytes:
         return JSONResponse(status_code=413, content={"error": "Request body too large"})
     return await call_next(request)
+
+@app.middleware("http")
+async def security_headers_middleware(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    # Only add HSTS if behind TLS (don't break HTTP development)
+    if request.url.scheme == "https":
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return response
 
 # ---------------------------------------------------------------------------
 # Startup timestamp for uptime calculation
@@ -3345,7 +3367,17 @@ def _resolve_upstream_for_model(
     request: Request,
     headers: dict[str, str],
 ) -> tuple[str, dict[str, str], str | None]:
+    # SECURITY: The x-ruleshield-provider header is treated as an enum value,
+    # NOT as an arbitrary URL.  It only matches the literal "openrouter"
+    # (routed to the hardcoded _OPENROUTER_PROVIDER_URL) or falls back to the
+    # configured settings.provider_url.  This prevents SSRF via header injection.
     provider_override = (request.headers.get("x-ruleshield-provider") or "").strip().lower()
+    if provider_override and provider_override != "openrouter":
+        logger.warning(
+            "Ignoring unknown x-ruleshield-provider value: %s",
+            provider_override,
+        )
+        provider_override = ""
     use_openrouter = provider_override == "openrouter" or _is_openrouter_model(model)
     if not use_openrouter:
         logger.info(
