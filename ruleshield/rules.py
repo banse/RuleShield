@@ -918,3 +918,150 @@ class RuleEngine:
             if ctype == "max_messages" and msg_count > cvalue:
                 return False
         return True
+
+    # ---- condition tree evaluation ----
+
+    _MAX_TREE_DEPTH = 10
+
+    def _evaluate_condition_tree(
+        self,
+        node: dict[str, Any],
+        text: str,
+        msg_count: int,
+        depth: int = 0,
+    ) -> tuple[bool, float, list[str], list[str]]:
+        """Evaluate a nested condition tree.
+
+        Returns ``(passed, score, matched_keywords, matched_patterns)``.
+
+        Branch nodes (``all``, ``any``, ``not``) recurse into children.
+        Leaf nodes (``type`` key) evaluate a single pattern or condition.
+        """
+        if depth > self._MAX_TREE_DEPTH:
+            import logging
+            logging.getLogger("ruleshield.rules").warning(
+                "Condition tree exceeded max depth %d", self._MAX_TREE_DEPTH,
+            )
+            return (False, 0.0, [], [])
+
+        # ── Branch: all ──────────────────────────────────────────────
+        if "all" in node:
+            children = node["all"]
+            total_score = 0.0
+            all_kw: list[str] = []
+            all_pat: list[str] = []
+            for child in children:
+                passed, sc, kw, pat = self._evaluate_condition_tree(
+                    child, text, msg_count, depth + 1,
+                )
+                if not passed:
+                    return (False, 0.0, [], [])
+                total_score += sc
+                all_kw.extend(kw)
+                all_pat.extend(pat)
+            return (True, total_score, all_kw, all_pat)
+
+        # ── Branch: any ──────────────────────────────────────────────
+        if "any" in node:
+            children = node["any"]
+            any_passed = False
+            total_score = 0.0
+            all_kw: list[str] = []
+            all_pat: list[str] = []
+            for child in children:
+                passed, sc, kw, pat = self._evaluate_condition_tree(
+                    child, text, msg_count, depth + 1,
+                )
+                if passed:
+                    any_passed = True
+                    total_score += sc
+                    all_kw.extend(kw)
+                    all_pat.extend(pat)
+            if not any_passed:
+                return (False, 0.0, [], [])
+            return (True, total_score, all_kw, all_pat)
+
+        # ── Branch: not ──────────────────────────────────────────────
+        if "not" in node:
+            child = node["not"]
+            passed, _sc, _kw, _pat = self._evaluate_condition_tree(
+                child, text, msg_count, depth + 1,
+            )
+            if passed:
+                return (False, 0.0, [], [])
+            return (True, 0.0, [], [])
+
+        # ── Leaf node ────────────────────────────────────────────────
+        return self._evaluate_leaf(node, text, msg_count)
+
+    def _evaluate_leaf(
+        self,
+        node: dict[str, Any],
+        text: str,
+        msg_count: int,
+    ) -> tuple[bool, float, list[str], list[str]]:
+        """Evaluate a single leaf node in a condition tree."""
+        ptype = node.get("type", "")
+        value = node.get("value", "")
+        field_text = self._resolve_field(
+            node.get("field", "last_user_message"), text,
+        )
+        text_lower = field_text.lower()
+        value_lower = str(value).lower() if isinstance(value, str) else ""
+
+        # ── Score-contributing pattern leaves ─────────────────────────
+        if ptype == "contains":
+            if value_lower in text_lower:
+                return (True, KEYWORD_WEIGHT, [value], [])
+            return (False, 0.0, [], [])
+
+        if ptype == "startswith":
+            if text_lower.startswith(value_lower):
+                return (True, KEYWORD_WEIGHT, [value], [])
+            return (False, 0.0, [], [])
+
+        if ptype == "exact":
+            if text_lower == value_lower:
+                return (True, EXACT_WEIGHT, [], [value])
+            return (False, 0.0, [], [])
+
+        if ptype == "regex":
+            try:
+                if _get_regex(value).search(field_text):
+                    return (True, PATTERN_WEIGHT, [], [value])
+            except re.error:
+                pass
+            return (False, 0.0, [], [])
+
+        if ptype == "word_boundary":
+            regex_pat = rf"\b{re.escape(value)}\b"
+            try:
+                if _get_regex(regex_pat).search(field_text):
+                    return (True, KEYWORD_WEIGHT, [value], [])
+            except re.error:
+                pass
+            return (False, 0.0, [], [])
+
+        # ── Boolean gate leaves ───────────────────────────────────────
+        if ptype == "not_contains":
+            if value_lower in text_lower:
+                return (False, 0.0, [], [])
+            return (True, 0.0, [], [])
+
+        if ptype == "max_length":
+            if len(field_text) > int(value):
+                return (False, 0.0, [], [])
+            return (True, CONDITION_WEIGHT, [], [])
+
+        if ptype == "min_length":
+            if len(field_text) < int(value):
+                return (False, 0.0, [], [])
+            return (True, CONDITION_WEIGHT, [], [])
+
+        if ptype == "max_messages":
+            if msg_count > int(value):
+                return (False, 0.0, [], [])
+            return (True, CONDITION_WEIGHT, [], [])
+
+        # Unknown leaf type — treat as failed.
+        return (False, 0.0, [], [])
