@@ -9,6 +9,7 @@ Enhanced with weighted matching patterns:
   - Dual-trigger matching: keyword AND context conditions scored together.
   - Minimum score threshold to prevent weak single-keyword false positives.
   - Score-based tie-breaking within the same priority tier.
+  - Nested condition trees (all/any/not) for expressive boolean logic.
 
 Performance target: < 2ms per match call.
 """
@@ -267,9 +268,17 @@ class RuleEngine:
     init the engine copies bundled default rules into the user directory if it
     is empty, providing a useful out-of-the-box experience.
 
-    Match semantics:
+    Match semantics (flat rules):
       - Patterns are evaluated with OR logic (any match fires the rule).
       - Conditions are evaluated with AND logic (all must be satisfied).
+
+    Match semantics (condition_tree rules):
+      - Nested ``all``/``any``/``not`` boolean logic at any depth.
+      - Leaf nodes support all pattern types plus ``word_boundary`` and
+        ``not_contains``.
+      - Overrides flat ``patterns``/``conditions`` when present.
+
+    Common to both:
       - Rules are tried in descending priority order; first match wins.
       - Each successful match increments the rule's ``hit_count``.
       - Rules with confidence below ``deactivation_threshold`` are skipped.
