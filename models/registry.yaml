@@ -1,0 +1,63 @@
+version: 1
+
+models:
+  - id: "nvidia/nemotron-3-super-120b-a12b:free"
+    name: "Nvidia Nemotron 120B"
+    provider: openrouter
+    tier: free
+    confidence_threshold: 0.55
+    pricing: {input: 0.0, output: 0.0}
+    test_capable: true
+    tags: [free, chat, reasoning]
+
+  - id: "minimax/minimax-m2.5:free"
+    name: "MiniMax M2.5"
+    provider: openrouter
+    tier: free
+    confidence_threshold: 0.55
+    pricing: {input: 0.0, output: 0.0}
+    test_capable: true
+    tags: [free, chat]
+
+  - id: "nvidia/llama-nemotron-embed-vl-1b-v2:free"
+    name: "Nvidia Nemotron Embed 1B"
+    provider: openrouter
+    tier: free
+    confidence_threshold: 0.45
+    pricing: {input: 0.0, output: 0.0}
+    test_capable: false
+    tags: [free, embedding]
+
+  - id: "gpt-4o-mini"
+    name: "GPT-4o Mini"
+    provider: openai
+    tier: cheap
+    confidence_threshold: 0.60
+    pricing: {input: 0.15, output: 0.60}
+    test_capable: true
+    tags: [chat]
+
+  - id: "claude-haiku-4-5"
+    name: "Claude Haiku 4.5"
+    provider: anthropic
+    tier: cheap
+    confidence_threshold: 0.60
+    pricing: {input: 0.80, output: 4.00}
+    test_capable: true
+    tags: [chat]
+
+  - id: "gpt-4o"
+    name: "GPT-4o"
+    provider: openai
+    tier: mid
+    confidence_threshold: 0.75
+    pricing: {input: 2.50, output: 10.00}
+    test_capable: true
+    tags: [chat]
+
+test_generation:
+  prompts_per_category: 2
+  fixture_file: tests/fixtures/prompts.json
+  output_pytest: tests/integration/auto/
+  output_stories: tests/stories/auto/
+  proxy_port: 8347
