@@ -211,6 +211,15 @@ class SmartRouter:
         if config and "model_map" in config:
             self.model_map.update(config["model_map"])
 
+        # --- Free model enforcement ----------------------------------------
+        # When enabled, ANY model not in the allowlist gets replaced with
+        # the default free model. This prevents Codex/Claude from silently
+        # switching to expensive models.
+        fme = config.get("free_model_enforcement", {}) if config else {}
+        self._free_enforcement_enabled: bool = fme.get("enabled", False)
+        self._free_allowed_models: set[str] = set(fme.get("allowed_models", []))
+        self._free_default_model: str = fme.get("default_model", "")
+
         # --- Stats tracking (thread-safe) ----------------------------------
         self._lock = threading.Lock()
         self._stats: dict[str, int] = {"cheap": 0, "mid": 0, "premium": 0}
@@ -263,6 +272,19 @@ class SmartRouter:
             f"model {'changed to ' + replacement_model if routed else 'kept as ' + original_model} "
             f"({elapsed_us:.0f}us)"
         )
+
+        # --- Free model enforcement: override any non-allowed model -------
+        final_model = replacement_model if routed else original_model
+        if self._free_enforcement_enabled and self._free_allowed_models:
+            if final_model not in self._free_allowed_models:
+                replacement_model = self._free_default_model
+                routed = True
+                reason = (
+                    f"score={score}/10 -> {tier_label} tier, "
+                    f"FREE ENFORCEMENT: {final_model} -> {replacement_model} "
+                    f"({elapsed_us:.0f}us)"
+                )
+                logger.info("Free model enforcement: %s -> %s", final_model, replacement_model)
 
         # Update stats
         with self._lock:
