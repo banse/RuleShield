@@ -770,6 +770,15 @@ class RuleEngine:
                         continue
                     if ("patterns" not in rule and "condition_tree" not in rule) or "response" not in rule:
                         continue
+                    # Validate condition_tree structure if present.
+                    if "condition_tree" in rule:
+                        if not self._validate_condition_tree(rule["condition_tree"]):
+                            import logging
+                            logging.getLogger("ruleshield.rules").warning(
+                                "Skipping rule %s: invalid condition_tree",
+                                rule.get("id", "<unknown>"),
+                            )
+                            continue
                     rule.setdefault("deployment", deployment)
                     rule.setdefault("shadow_hit_count", 0)
                     rules.append(rule)
@@ -923,6 +932,42 @@ class RuleEngine:
                 return False
             if ctype == "max_messages" and msg_count > cvalue:
                 return False
+        return True
+
+    # ---- condition tree validation ----
+
+    @staticmethod
+    def _validate_condition_tree(node: dict[str, Any]) -> bool:
+        """Validate a condition tree structure recursively.
+
+        Returns True if valid, False otherwise.  Does not raise.
+        """
+        if not isinstance(node, dict):
+            return False
+
+        # Branch nodes
+        if "all" in node:
+            children = node["all"]
+            if not isinstance(children, list) or len(children) == 0:
+                return False
+            return all(RuleEngine._validate_condition_tree(c) for c in children)
+
+        if "any" in node:
+            children = node["any"]
+            if not isinstance(children, list) or len(children) == 0:
+                return False
+            return all(RuleEngine._validate_condition_tree(c) for c in children)
+
+        if "not" in node:
+            child = node["not"]
+            if not isinstance(child, dict):
+                return False
+            return RuleEngine._validate_condition_tree(child)
+
+        # Leaf node — must have "type"
+        if "type" not in node:
+            return False
+
         return True
 
     # ---- condition tree evaluation ----

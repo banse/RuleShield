@@ -262,3 +262,35 @@ class TestBothFieldsPresent:
         result_bye = engine.match("goodbye", model="gpt-4o-mini")
         assert result_bye is not None
         assert result_bye["rule_id"] == "both_fields"
+
+
+class TestValidation:
+    def test_valid_tree_accepted(self, engine):
+        assert engine._validate_condition_tree(
+            {"all": [{"type": "contains", "value": "hi", "field": "last_user_message"}]}
+        ) is True
+
+    def test_empty_all_rejected(self, engine):
+        assert engine._validate_condition_tree({"all": []}) is False
+
+    def test_not_with_list_rejected(self, engine):
+        assert engine._validate_condition_tree(
+            {"not": [{"type": "contains", "value": "hi", "field": "last_user_message"}]}
+        ) is False
+
+    def test_leaf_without_type_rejected(self, engine):
+        assert engine._validate_condition_tree({"value": "hi"}) is False
+
+    def test_unknown_branch_key_rejected(self, engine):
+        assert engine._validate_condition_tree({"xor": [{"type": "contains", "value": "hi"}]}) is False
+
+    def test_nested_valid_tree(self, engine):
+        assert engine._validate_condition_tree({
+            "all": [
+                {"any": [
+                    {"type": "contains", "value": "a", "field": "last_user_message"},
+                    {"not": {"type": "exact", "value": "b", "field": "last_user_message"}},
+                ]},
+                {"type": "max_length", "value": 100, "field": "last_user_message"},
+            ]
+        }) is True
