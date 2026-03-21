@@ -92,8 +92,10 @@ engine.match(context={"user_input": "git push", "channel": "slack", "msg_count":
 def _resolve_field(field: str, context: dict[str, Any]) -> Any:
     if field not in context:
         return ""  # missing field = empty string, fails gracefully
-    return str(context[field])
+    return context[field]  # returns raw value — each leaf type handles its own coercion
 ```
+
+String leaf types (`contains`, `exact`, `regex`, `startswith`, `word_boundary`, `not_contains`) call `str(value).lower()` on the resolved field. Numeric leaf types (`max_value`, `max_length`, `min_length`) coerce as needed within their own evaluation logic. The resolver itself does NOT coerce types.
 
 Existing RuleShield rules work unchanged — RuleShield passes `context={"last_user_message": text, "msg_count": n}`.
 
@@ -104,7 +106,9 @@ Existing RuleShield rules work unchanged — RuleShield passes `context={"last_u
 | `max_messages` | `max_value` | Fails if `int(context[field]) > value` |
 | `min_length` | `min_length` | Unchanged — string length check |
 | `max_length` | `max_length` | Unchanged — string length check |
-| All others | Same name | Unchanged |
+| `word_boundary` | `word_boundary` | Unchanged — `\b` word boundary regex |
+| `not_contains` | `not_contains` | Unchanged — boolean gate, score 0 |
+| `contains`, `startswith`, `exact`, `regex` | Same name | Unchanged |
 
 `max_messages` is kept as an alias for `max_value` for backward compatibility.
 
@@ -141,11 +145,12 @@ class MatchResult:
 ## FeedbackManager (Layers 1+2)
 
 ### Layer 1 — Core feedback loop
-- `accept(rule_id, prompt)` — confidence += 0.01
-- `reject(rule_id, prompt, correction=None)` — confidence -= 0.05
-- `correct(rule_id, prompt, correction)` — confidence -= 0.03, logs correction
+- `accept(rule_id, prompt)` — EMA-style: `confidence + delta * (1 - confidence)`, delta=0.01
+- `reject(rule_id, prompt, correction=None)` — EMA-style: `confidence - delta * confidence`, delta=0.05. Optional `correction` string is logged for analysis.
 - Auto-deactivation below `deactivation_threshold` (default 0.5)
-- Auto-promotion above `promotion_threshold` (default 0.85)
+- Auto-promotion above `promotion_threshold` (default 0.98)
+
+Note: The EMA formula matches the current RuleShield implementation. There is no separate `correct()` method — corrections are recorded via `reject()` with a `correction` parameter.
 - Per-component tracking: `classification_correct`, `response_helpful`, `confidence_appropriate`
 
 ### Layer 2 — Analytics
@@ -183,6 +188,8 @@ Ships with `JsonFileFeedbackStore` (zero deps, JSON file persistence). RuleShiel
 ## What Rulecore Does NOT Include
 
 - `MODEL_CONFIDENCE_THRESHOLDS` — LLM-specific, stays in RuleShield
+- `_get_model_threshold()` — LLM-specific threshold lookup
+- `_extract_last_user_message()` — OpenAI message format helper, stays in RuleShield
 - `pricing.py` — LLM-specific
 - `cache.py` — app-level caching
 - `template_optimizer.py` — prompt-specific
@@ -236,6 +243,26 @@ RuleShield is completely untouched during Phase 1.
 ### RuleShield adapter tests (Phase 2)
 - Existing test suite runs unchanged against the adapter wrappers
 - No new tests needed — existing coverage validates the migration
+
+## Additional Design Notes
+
+**Regex cache:** The existing `_regex_cache` (LRU dict, max 1024 entries) is carried forward into `conditions.py` for the < 2ms performance target.
+
+**Logging:** Rulecore uses its own logger namespace: `"rulecore.engine"`, `"rulecore.feedback"`, `"rulecore.loader"`. Not `"ruleshield.*"`.
+
+**Thread safety:** Rulecore is single-threaded. `engine.rules` is mutable instance state — concurrent access requires external locking. Document this in the README.
+
+**Error handling:** Silent and graceful, matching current behavior. Missing context fields return empty string. Malformed JSON files are skipped with a logged warning. Invalid `condition_tree` rules are skipped. `match()` returns `None` on no match, never raises.
+
+**`confidence_threshold` vs `min_score`:** These are different gates. `min_score` (in `ScoringConfig`) gates on pattern match quality — "did enough patterns match?" `confidence_threshold` (per `match()` call) gates on rule trustworthiness — "has this rule been reliable?" Both must pass for a rule to fire.
+
+**`MatchResult.response`:** Opaque pass-through from the rule JSON. The engine does not interpret or validate its contents. Consumers define their own response schema.
+
+**Packaging:** `engine/rulecore/` includes a `pyproject.toml` for `pip install -e engine/rulecore/`. Import path is `from rulecore import ...`.
+
+**State migration (Phase 2):** The Phase 2 adapter must use the same `_state.json` file path so existing hit counts and confidence values survive migration.
+
+**Async compat (Phase 2):** Current `async def init()` and `async_match()` are trivial wrappers around sync operations. Phase 2 adapters are trivial `async def` wrappers around rulecore's sync API — no `run_in_executor` needed.
 
 ## Out of Scope
 
