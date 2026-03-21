@@ -26,7 +26,8 @@ def free_router():
             "enabled": True,
             "allowed_models": [
             "nvidia/nemotron-3-super-120b-a12b:free",
-            "minimax/minimax-m2.5:free"
+            "minimax/minimax-m2.5:free",
+            "arcee-ai/trinity-large-preview:free"
             ],
             "default_model": "nvidia/nemotron-3-super-120b-a12b:free",
         }

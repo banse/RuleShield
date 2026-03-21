@@ -19,6 +19,15 @@ models:
     test_capable: true
     tags: [free, chat]
 
+  - id: "arcee-ai/trinity-large-preview:free"
+    name: "Arcee Trinity Large Preview"
+    provider: openrouter
+    tier: free
+    confidence_threshold: 0.55
+    pricing: {input: 0.0, output: 0.0}
+    test_capable: true
+    tags: [free, chat]
+
   - id: "nvidia/llama-nemotron-embed-vl-1b-v2:free"
     name: "Nvidia Nemotron Embed 1B"
     provider: openrouter

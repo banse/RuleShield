@@ -21,13 +21,14 @@ class TestModelRouting:
         assert threshold == pytest.approx(CONFIDENCE_THRESHOLD, abs=0.01)
 
     def test_free_enforcement_allows_model(self, free_router):
-        """Router should route to a free model (same or another from allowlist)."""
+        """Router allowlist should accept this free model."""
         result = free_router.route(
             "hello", None, MODEL_ID,
             provider_url="https://openrouter.ai/api/v1",
         )
+        # Final model should be free (same or another from allowlist)
         final_model = result["model"] if result["routed"] else MODEL_ID
-        allowed = {"nvidia/nemotron-3-super-120b-a12b:free", "minimax/minimax-m2.5:free"}
+        allowed = free_router._free_allowed_models
         assert final_model in allowed, f"Expected free model, got {final_model}"
 
     def test_free_enforcement_blocks_expensive(self, free_router):
