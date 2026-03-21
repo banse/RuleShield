@@ -18,6 +18,7 @@ def rules_dir():
          "response": {"content": "hi!"}, "confidence": 0.95, "priority": 10, "enabled": True},
         {"id": "git_tree", "condition_tree": {"all": [
             {"type": "contains", "value": "git", "field": "text"},
+            {"type": "regex", "value": "\\b(push|pull|commit)\\b", "field": "text"},
             {"not": {"type": "contains", "value": "actions", "field": "text"}},
         ]}, "response": {"content": "git help"}, "confidence": 0.88, "priority": 7, "enabled": True},
         {"id": "low_conf", "patterns": [{"type": "exact", "value": "test", "field": "text"}],
