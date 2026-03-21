@@ -469,22 +469,27 @@ class RuleEngine:
             if best is not None and rule_priority < best_priority:
                 break
 
-            if not self._conditions_met(rule, last_user_msg, msg_count):
-                continue
+            # ── Scoring: condition_tree path vs flat path ────────────
+            if "condition_tree" in rule:
+                passed, score, matched_kw, matched_pat = self._evaluate_condition_tree(
+                    rule["condition_tree"], last_user_msg, msg_count,
+                )
+                if not passed or score < self.min_score_threshold:
+                    continue
+            else:
+                if not self._conditions_met(rule, last_user_msg, msg_count):
+                    continue
 
-            score, matched_kw, matched_pat = self._score_rule(rule, last_user_msg)
+                score, matched_kw, matched_pat = self._score_rule(rule, last_user_msg)
 
-            # Conditions only add bonus if a real pattern matched.
-            # Without this guard, conditions alone (max_length etc.) would cause
-            # false positives on any short prompt.
-            if score > 0:
-                conditions = rule.get("conditions", [])
-                if conditions:
-                    score += len(conditions) * CONDITION_WEIGHT
+                # Conditions only add bonus if a real pattern matched.
+                if score > 0:
+                    conditions = rule.get("conditions", [])
+                    if conditions:
+                        score += len(conditions) * CONDITION_WEIGHT
 
-            # Skip rules below the minimum score threshold.
-            if score < self.min_score_threshold:
-                continue
+                if score < self.min_score_threshold:
+                    continue
 
             if score > best_score:
                 has_keywords = len(matched_kw) > 0
@@ -572,6 +577,7 @@ class RuleEngine:
                 "shadow_hit_count": r.get("shadow_hit_count", 0),
                 "confidence": r.get("confidence", 1.0),
                 "pattern_count": len(r.get("patterns", [])),
+                "has_condition_tree": "condition_tree" in r,
             }
             for r in self.rules
             if r.get("enabled", True)
@@ -762,7 +768,7 @@ class RuleEngine:
                     # Real rules must define at least patterns and response payload.
                     if not isinstance(rule, dict):
                         continue
-                    if "patterns" not in rule or "response" not in rule:
+                    if ("patterns" not in rule and "condition_tree" not in rule) or "response" not in rule:
                         continue
                     rule.setdefault("deployment", deployment)
                     rule.setdefault("shadow_hit_count", 0)
