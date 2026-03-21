@@ -316,9 +316,10 @@ def generate_pytest_file(model: dict[str, Any], prompts_per_category: int = 2) -
             "hello", None, MODEL_ID,
             provider_url="https://openrouter.ai/api/v1",
         )
-        # Should either not route (already free) or route to same/another free model
-        if result["routed"]:
-            assert "FREE ENFORCEMENT" not in result["reason"] or result["model"] == MODEL_ID
+        # Final model should be free (same or another from allowlist)
+        final_model = result["model"] if result["routed"] else MODEL_ID
+        allowed = free_router._free_allowed_models
+        assert final_model in allowed, f"Expected free model, got {{final_model}}"
 
     def test_free_enforcement_blocks_expensive(self, free_router):
         """Router should block expensive models and replace with free."""
