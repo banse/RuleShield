@@ -755,6 +755,21 @@ def _ensure_external_helper(run_dir: Path) -> Path:
                 kwargs.pop("cwd", None)
                 kwargs.pop("workdir", None)
                 agent = Agent(**kwargs)
+            # Check if model is in registry
+            try:
+                _registry_path = Path(__file__).resolve().parent.parent / "models" / "registry.yaml"
+                if _registry_path.exists():
+                    _reg = yaml.safe_load(_registry_path.read_text(encoding="utf-8"))
+                    _known_ids = {m["id"] for m in _reg.get("models", [])}
+                    if model and model not in _known_ids:
+                        logger.info(
+                            "Model %s not in models/registry.yaml. "
+                            "Add it and run: python scripts/generate_model_tests.py --models %s",
+                            model, model,
+                        )
+            except Exception:
+                pass  # non-critical
+
             return agent, import_target
 
         def _send(agent, prompt):
