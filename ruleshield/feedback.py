@@ -68,11 +68,8 @@ _MIGRATIONS_COMPONENT_COLUMNS = [
 class RuleFeedback:
     """Tracks feedback on rule responses to improve confidence scores.
 
-    Simple bandit algorithm:
-      - Rule response accepted (no correction follows) -> confidence += delta
-      - Rule response rejected (user corrects)         -> confidence -= delta
-      - Confidence drops below threshold                -> rule deactivated
-      - Confidence rises above threshold                -> rule promoted
+    Delegates confidence math to rulecore.FeedbackManager (EMA formula).
+    Persists feedback and events to SQLite via aiosqlite.
 
     The feedback data is persisted in the same SQLite database used by the
     cache layer so that a single ``cache.db`` file holds all runtime state.
@@ -92,6 +89,31 @@ class RuleFeedback:
         self.rejection_delta: float = 0.05    # larger penalty per reject
         self.deactivation_threshold: float = 0.5
         self.promotion_threshold: float = 0.98
+
+        # Rulecore integration for confidence math
+        from rulecore.feedback import FeedbackManager as _CoreFeedback
+        from rulecore.store import JsonFileFeedbackStore as _NullStore
+
+        class _BufferStore:
+            """Captures rulecore events for async sqlite flush."""
+            def __init__(self):
+                self.pending_events = []
+            def save_feedback(self, entry):
+                pass  # sqlite persistence handled by RuleFeedback directly
+            def save_event(self, event):
+                self.pending_events.append(event)
+            def load_feedback(self, rule_id=None):
+                return []
+
+        self._rulecore_store = _BufferStore()
+        self._core_feedback = _CoreFeedback(
+            engine=self.rule_engine,
+            store=self._rulecore_store,
+            acceptance_delta=self.acceptance_delta,
+            rejection_delta=self.rejection_delta,
+            deactivation_threshold=self.deactivation_threshold,
+            promotion_threshold=self.promotion_threshold,
+        )
 
     # ------------------------------------------------------------------
     # Lifecycle
@@ -223,13 +245,10 @@ class RuleFeedback:
     # ------------------------------------------------------------------
 
     async def update_confidence(self, rule_id: str, accepted: bool) -> None:
-        """Update rule confidence using an exponential-moving-average style step.
+        """Update rule confidence using rulecore's EMA implementation.
 
-        On accept:  confidence = confidence + delta * (1 - confidence)
-        On reject:  confidence = confidence - delta * confidence
-
-        This ensures confidence stays bounded in (0, 1) and converges
-        smoothly rather than oscillating.
+        Delegates math to rulecore.FeedbackManager, then flushes
+        buffered events to sqlite.
         """
         rule = self._find_rule(rule_id)
         if rule is None:
@@ -238,27 +257,23 @@ class RuleFeedback:
 
         current = rule.get("confidence", 1.0)
 
-        if accepted:
-            new_confidence = current + self.acceptance_delta * (1.0 - current)
-        else:
-            new_confidence = current - self.rejection_delta * current
+        # Delegate to rulecore for the EMA math
+        self._core_feedback._update_confidence(rule_id, accepted=accepted)
 
-        # Clamp to [0, 1]
-        new_confidence = max(0.0, min(1.0, new_confidence))
+        new_confidence = rule.get("confidence", current)
 
-        self.rule_engine.update_confidence(rule_id, new_confidence)
-
-        delta = new_confidence - current
-        direction = "up" if delta > 0 else ("down" if delta < 0 else "flat")
-        await self.log_rule_event(
-            rule_id=rule_id,
-            event_type="confidence_update",
-            direction=direction,
-            old_confidence=current,
-            new_confidence=new_confidence,
-            delta=delta,
-            details={"source": "feedback_accept" if accepted else "feedback_reject"},
-        )
+        # Flush buffered events from rulecore store to sqlite
+        for event in self._rulecore_store.pending_events:
+            await self.log_rule_event(
+                rule_id=event.rule_id,
+                event_type=event.event_type,
+                direction=event.direction,
+                old_confidence=event.old_confidence,
+                new_confidence=event.new_confidence,
+                delta=event.delta,
+                details=event.details,
+            )
+        self._rulecore_store.pending_events.clear()
 
         # Check thresholds after update
         await self.check_deactivations()
