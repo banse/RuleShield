@@ -1,0 +1,76 @@
+[
+  {
+    "id": "nested_git_help",
+    "name": "Git Help (not CI)",
+    "description": "Matches git questions but excludes CI/Actions topics",
+    "condition_tree": {
+      "all": [
+        {"any": [
+          {"type": "word_boundary", "value": "git", "field": "last_user_message"},
+          {"type": "regex", "value": "\\b(commit|push|pull|merge|rebase)\\b", "field": "last_user_message"}
+        ]},
+        {"not": {"type": "contains", "value": "github actions", "field": "last_user_message"}},
+        {"type": "max_length", "value": 200, "field": "last_user_message"}
+      ]
+    },
+    "response": {
+      "content": "I can help with that git operation. What specifically do you need?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.88,
+    "priority": 7,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "nested_short_greeting",
+    "name": "Short Greeting (not question)",
+    "description": "Matches short greetings that are not questions",
+    "condition_tree": {
+      "all": [
+        {"any": [
+          {"type": "exact", "value": "hi", "field": "last_user_message"},
+          {"type": "exact", "value": "hello", "field": "last_user_message"},
+          {"type": "exact", "value": "hey", "field": "last_user_message"}
+        ]},
+        {"type": "not_contains", "value": "?", "field": "last_user_message"},
+        {"type": "max_length", "value": 10, "field": "last_user_message"}
+      ]
+    },
+    "response": {
+      "content": "Hey there! How can I help?",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.92,
+    "priority": 11,
+    "enabled": true,
+    "hit_count": 0
+  },
+  {
+    "id": "nested_code_review",
+    "name": "Code Review Request",
+    "description": "Detects code review requests with file context",
+    "condition_tree": {
+      "all": [
+        {"any": [
+          {"type": "word_boundary", "value": "review", "field": "last_user_message"},
+          {"type": "contains", "value": "code review", "field": "last_user_message"},
+          {"type": "contains", "value": "PR review", "field": "last_user_message"}
+        ]},
+        {"any": [
+          {"type": "regex", "value": "\\.(py|js|ts|go|rs)$", "field": "last_user_message"},
+          {"type": "contains", "value": "pull request", "field": "last_user_message"},
+          {"type": "contains", "value": "diff", "field": "last_user_message"}
+        ]}
+      ]
+    },
+    "response": {
+      "content": "I'd be happy to help review that code. Let me take a look at the changes.",
+      "model": "ruleshield-rule"
+    },
+    "confidence": 0.85,
+    "priority": 6,
+    "enabled": true,
+    "hit_count": 0
+  }
+]
