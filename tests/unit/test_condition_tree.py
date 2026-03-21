@@ -169,3 +169,96 @@ class TestNotContains:
         passed, score, kw, pat = engine._evaluate_condition_tree(tree, "hello world", 0)
         assert passed is True
         assert score == 0
+
+
+class TestDepthLimit:
+    def test_exceeding_depth_returns_false(self, engine):
+        """11-deep tree should fail gracefully."""
+        leaf = {"type": "contains", "value": "hello", "field": "last_user_message"}
+        tree = leaf
+        for _ in range(11):
+            tree = {"all": [tree]}
+        passed, score, kw, pat = engine._evaluate_condition_tree(tree, "hello", 0)
+        assert passed is False
+        assert score == 0
+
+
+class TestScoreThresholdFiltering:
+    def test_tree_passes_but_score_below_threshold(self, engine):
+        """A tree of only not-gates passes with score 0 — should not fire."""
+        rule = {
+            "id": "only_not",
+            "condition_tree": {
+                "all": [
+                    {"not": {"type": "contains", "value": "bad", "field": "last_user_message"}},
+                ]
+            },
+            "response": {"content": "matched", "model": "ruleshield-rule"},
+            "confidence": 0.95,
+            "priority": 10,
+            "enabled": True,
+            "deployment": "production",
+        }
+        engine.rules = [rule]
+        result = engine.match("hello world", model="gpt-4o-mini")
+        assert result is None
+
+
+class TestConditionLeafScoring:
+    def test_max_length_contributes_condition_weight(self, engine):
+        tree = {"all": [
+            {"type": "contains", "value": "git", "field": "last_user_message"},
+            {"type": "max_length", "value": 100, "field": "last_user_message"},
+        ]}
+        passed, score, kw, pat = engine._evaluate_condition_tree(tree, "git help", 0)
+        assert passed is True
+        assert score == KEYWORD_WEIGHT + CONDITION_WEIGHT
+
+    def test_min_length_contributes_condition_weight(self, engine):
+        tree = {"all": [
+            {"type": "regex", "value": "\\bgit\\b", "field": "last_user_message"},
+            {"type": "min_length", "value": 3, "field": "last_user_message"},
+        ]}
+        passed, score, kw, pat = engine._evaluate_condition_tree(tree, "git help", 0)
+        assert passed is True
+        assert score == PATTERN_WEIGHT + CONDITION_WEIGHT
+
+
+class TestMaxMessages:
+    def test_max_messages_uses_msg_count(self, engine):
+        tree = {"type": "max_messages", "value": 5, "field": "last_user_message"}
+        passed, score, _, _ = engine._evaluate_condition_tree(tree, "anything", 3)
+        assert passed is True
+        assert score == CONDITION_WEIGHT
+
+    def test_max_messages_fails_when_exceeded(self, engine):
+        tree = {"type": "max_messages", "value": 5, "field": "last_user_message"}
+        passed, score, _, _ = engine._evaluate_condition_tree(tree, "anything", 10)
+        assert passed is False
+
+
+class TestBothFieldsPresent:
+    def test_condition_tree_takes_priority_over_patterns(self, engine):
+        """When both condition_tree and patterns exist, tree wins."""
+        rule = {
+            "id": "both_fields",
+            "patterns": [
+                {"type": "exact", "value": "hello", "field": "last_user_message"},
+            ],
+            "condition_tree": {
+                "all": [
+                    {"type": "exact", "value": "goodbye", "field": "last_user_message"},
+                ]
+            },
+            "response": {"content": "tree wins", "model": "ruleshield-rule"},
+            "confidence": 0.95,
+            "priority": 10,
+            "enabled": True,
+            "deployment": "production",
+        }
+        engine.rules = [rule]
+        result_hello = engine.match("hello", model="gpt-4o-mini")
+        assert result_hello is None
+        result_bye = engine.match("goodbye", model="gpt-4o-mini")
+        assert result_bye is not None
+        assert result_bye["rule_id"] == "both_fields"
