@@ -96,7 +96,11 @@ python scripts/generate_model_tests.py --tags free         # all models tagged "
 python scripts/generate_model_tests.py --dry-run           # show what would be generated
 ```
 
-**Zero external dependencies.** Uses stdlib `string.Template` for rendering. Parses YAML with a simple subset parser (~30 lines) or PyYAML if available.
+**Zero external dependencies.** Uses stdlib `string.Template` for rendering. Parses YAML via PyYAML (already a de facto dependency — `prompt_training.py` imports it) with stdlib JSON fallback.
+
+**Confidence thresholds:** The generator calls `ruleshield.rules._get_model_threshold(model_id)` at generation time to get the *real* runtime threshold for each model, not the YAML value. The YAML `confidence_threshold` is informational/aspirational. Generated tests use the runtime value.
+
+**Registry validation:** The generator validates each model entry before generating: required fields (`id`, `provider`, `tier`, `test_capable`), allowed values for `tier` (`free`/`cheap`/`mid`/`premium`), and type checks. Invalid entries are skipped with a warning.
 
 ### Generated pytest file (`tests/integration/auto/test_model_{safe_id}.py`)
 
@@ -123,7 +127,7 @@ TIER = "free"
 `TestModelRuleMatch`:
 - `test_rule_trigger_{prompt_name}` — 2 prompts from `rule_trigger` fixture category, verify rule fires
 - `test_passthrough_{prompt_name}` — 2 prompts from `passthrough` fixture, verify no rule match
-- `test_temporal_not_cached` — 1 prompt from `temporal` fixture (if model is chat-capable)
+- `test_temporal_passthrough` — 1 prompt from `temporal` fixture, verify it does NOT match a rule (temporal queries should always go to LLM)
 
 Total: ~7-8 tests per model.
 
@@ -180,10 +184,14 @@ def engine():
 
 @pytest.fixture
 def free_router():
+    """Built by generator: allowed_models populated from registry (tier=free, test_capable=true)."""
     return SmartRouter(config={
         "free_model_enforcement": {
             "enabled": True,
-            "allowed_models": [...],  # read from registry
+            "allowed_models": [
+                "nvidia/nemotron-3-super-120b-a12b:free",
+                "minimax/minimax-m2.5:free",
+            ],  # auto-populated by generator from registry
             "default_model": "nvidia/nemotron-3-super-120b-a12b:free",
         }
     })
@@ -201,9 +209,17 @@ def prompts():
 |-------|--------------------------|-----|
 | Commit (fast) | No | Only smoke/unit |
 | Core (CI) | Yes — pytest | `tests/integration/auto/` discovered by pytest |
-| Full (e2e) | Yes — bash stories | `tests/stories/auto/` discovered by suite_runner.sh |
+| Full (e2e) | Yes — model suite | New `scripts/run-model-suite.sh` with glob discovery |
 
-**suite_runner.sh change:** Update glob from `tests/stories/*.sh` to include `tests/stories/**/*.sh` (one-line fix).
+**Suite integration:** Existing suite runners (`run-core-suite.sh`, etc.) use hardcoded `suite_case` calls, not globs. Instead of modifying them, the generator also outputs a `scripts/run-model-suite.sh` that:
+1. Starts the RuleShield proxy (sources `_stories_helpers.sh` for gateway lifecycle)
+2. Discovers and runs all `tests/stories/auto/story_model_*.sh`
+3. Reports pass/fail counts
+4. Stops the proxy on exit
+
+The core suite runner can call this as a single `suite_case` entry. The generator updates the model suite script whenever models change.
+
+**Generated bash stories** source `tests/stories/_stories_helpers.sh` for `PYTHON_BIN` detection and consistent error handling. They assume the proxy is already running (managed by the model suite runner), consistent with the batch-execution pattern.
 
 ## Training Monitor Extension
 
